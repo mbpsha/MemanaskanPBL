@@ -3,7 +3,7 @@
         <nav class="container mx-auto px-8 py-3 flex justify-between items-center">
             <div class="flex items-center">
                 <Link href="/">
-                    <img src="/images/homepage/logoRun.png" alt="Ramadan Vaganza" class="h-14 cursor-pointer" />
+                    <img src="/images/logoRun.png" alt="Ramadan Vaganza" class="h-14 cursor-pointer" />
                 </Link>
             </div>
             

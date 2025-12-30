@@ -2,7 +2,7 @@
     <footer class="bg-[#1e2947] text-white py-12">
         <div class="container mx-auto px-8 text-center">
             <div class="mb-8">
-                <img src="/images/homepage/logoRun.png" alt="Ramadan Vaganza 2026" class="h-32 mx-auto" />
+                <img src="/images/logoRun.png" alt="Ramadan Vaganza 2026" class="h-32 mx-auto" />
             </div>
             
             <div class="flex justify-center gap-12 mb-8">
