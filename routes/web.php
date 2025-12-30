@@ -4,10 +4,13 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Api\RegistrationController;
 use App\Http\Controllers\Admin\RegistrationManagementController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
+use Inertia\Inertia;
 
-// ============================================
-// PUBLIC API ROUTES (No Authentication)
-// ============================================
+// Landing Page
+Route::get('/', function () {
+    return Inertia::render('Landing');
+});
 
 // Event Registration API
 Route::prefix('api')->group(function () {
@@ -24,9 +27,6 @@ Route::prefix('api')->group(function () {
     Route::get('/registrations', [RegistrationController::class, 'index']);
 });
 
-// ============================================
-// ADMIN ROUTES (Authentication Required)
-// ============================================
 
 Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
     // Registration Management
@@ -41,9 +41,6 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::get('/registrations/export/csv', [RegistrationManagementController::class, 'export'])->name('registrations.export');
 });
 
-// ============================================
-// AUTH ROUTES (Laravel Breeze)
-// ============================================
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
