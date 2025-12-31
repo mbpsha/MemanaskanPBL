@@ -8,9 +8,12 @@
                 <button class="bg-[#5865aa] text-white py-3 font-semibold rounded-l-lg">
                     LOGIN
                 </button>
-                <button class="bg-gray-200 text-gray-800 py-3 font-semibold rounded-r-lg hover:bg-gray-300 transition">
+                <Link
+                    href="/register"
+                    class="bg-gray-200 text-gray-800 py-3 font-semibold rounded-r-lg hover:bg-gray-300 transition text-center"
+                >
                     SIGN UP
-                </button>
+                </Link>
             </div>
             
             <!-- Login Form -->
@@ -59,7 +62,7 @@
 </template>
 
 <script setup>
-import { useForm } from '@inertiajs/vue3'
+import { useForm, Link } from '@inertiajs/vue3'
 
 const form = useForm({
     email: '',

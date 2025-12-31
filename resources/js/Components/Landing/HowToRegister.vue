@@ -45,14 +45,17 @@
             </div>
             
             <div class="text-center mt-12">
-                <button class="bg-yellow-400 hover:bg-yellow-500 text-gray-900 px-16 py-5 rounded-2xl text-2xl font-black transition shadow-xl">
+                <Link
+                    href="/event-registrations"
+                    class="bg-yellow-400 hover:bg-yellow-500 text-gray-900 px-16 py-5 rounded-2xl text-2xl font-black transition shadow-xl inline-block"
+                >
                     DAFTAR SEKARANG
-                </button>
+                </Link>
             </div>
         </div>
     </section>
 </template>
 
 <script setup>
-// How to register component
+    import { Link } from '@inertiajs/vue3'
 </script>

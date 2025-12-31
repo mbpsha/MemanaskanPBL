@@ -11,9 +11,9 @@
                 <Link href="/login" class="bg-orange-500 hover:bg-orange-600 text-white px-8 py-2.5 rounded-full font-semibold transition inline-block">
                     Masuk
                 </Link>
-                <button class="bg-white hover:bg-orange-50 text-orange-500 border-2 border-orange-500 px-8 py-2.5 rounded-full font-semibold transition">
+                <Link href="/register" class="bg-white hover:bg-orange-50 text-orange-500 border-2 border-orange-500 px-8 py-2.5 rounded-full font-semibold transition">
                     Daftar
-                </button>
+                </Link>
             </div>
         </nav>
     </header>
