@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Api\RegistrationController;
 use App\Http\Controllers\Admin\RegistrationManagementController;
+use App\Http\Controllers\EventRegistrationController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -27,7 +28,6 @@ Route::prefix('api')->group(function () {
     Route::get('/registrations', [RegistrationController::class, 'index']);
 });
 
-
 Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
     // Registration Management
     Route::get('/registrations', [RegistrationManagementController::class, 'index'])->name('registrations.index');
@@ -41,12 +41,13 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::get('/registrations/export/csv', [RegistrationManagementController::class, 'export'])->name('registrations.export');
 });
 
-
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    Route::get('/event-registrations', [EventRegistrationController::class, 'create'])->name('event.registrations');
+    Route::post('/event-registrations', [EventRegistrationController::class, 'store'])->name('event.registrations.post');
 });
 
-require __DIR__ . '/auth.php';
-
+require __DIR__.'/auth.php';
