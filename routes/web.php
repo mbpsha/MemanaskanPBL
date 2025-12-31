@@ -14,6 +14,12 @@ Route::get('/', function () {
     return Inertia::render('Landing');
 });
 
+// Dashboard
+Route::get('/dashboard', function () {
+    // After login/register, redirect to landing page
+    return redirect('/');
+})->middleware(['auth', 'verified'])->name('dashboard');
+
 // Event Registration API
 Route::prefix('api')->group(function () {
     // Register for event
@@ -53,4 +59,4 @@ Route::middleware('auth')->group(function () {
     Route::post('/event-registrations', [EventRegistrationController::class, 'store'])->name('event.registrations.post');
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
