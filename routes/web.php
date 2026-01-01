@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Api\RegistrationController;
 use App\Http\Controllers\Admin\RegistrationManagementController;
 use App\Http\Controllers\EventRegistrationController;
+use App\Http\Controllers\Admin\AdminMonitoringUserController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
@@ -37,6 +38,20 @@ Route::prefix('api')->group(function () {
 
 
 Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
+    // User Monitoring
+    Route::get('/users', [AdminMonitoringUserController::class, 'index'])
+        ->name('users');
+
+    Route::post('/users', [AdminMonitoringUserController::class, 'store'])
+        ->name('users.store');
+
+    Route::put('/users/{user}', [AdminMonitoringUserController::class, 'update'])
+        ->name('users.update');
+
+    Route::delete('/users/{user}', [AdminMonitoringUserController::class, 'destroy'])
+        ->name('users.destroy');
+    
+            
     // Registration Management
     Route::get('/registrations', [RegistrationManagementController::class, 'index'])->name('registrations.index');
     Route::get('/registrations/{registration}', [RegistrationManagementController::class, 'show'])->name('registrations.show');
