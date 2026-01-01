@@ -61,6 +61,14 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
+     * Get event registrations for the user.
+     */
+    public function eventRegistrations()
+    {
+        return $this->hasMany(EventRegistration::class, 'email', 'email');
+    }
+
+    /**
      * Check if user is admin.
      */
     public function isAdmin(): bool

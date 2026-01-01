@@ -25,13 +25,22 @@ class EventRegistrationController extends Controller
             'email'         => 'required|email',
             'illness'       => 'nullable|string',
             'shirt_size'    => 'required|in:M,L,XL',
-            'payment_method'=> 'required|in:qris,transfer',
+            'payment_method'=> 'required|in:QRIS,qris,transfer,Transfer',
             'ticket_type'   => 'required|string',
             'ticket_price'  => 'required|integer',
+            'payment_proof' => 'required|image|mimes:jpeg,png,jpg|max:5120',
         ]);
 
         // Generate kode registrasi unik
         $registrationCode = 'RV2026-' . strtoupper(Str::random(8));
+
+        // Upload payment proof
+        $paymentProofPath = null;
+        if ($request->hasFile('payment_proof')) {
+            $file = $request->file('payment_proof');
+            $filename = $registrationCode . '_' . time() . '.' . $file->getClientOriginalExtension();
+            $paymentProofPath = $file->storeAs('payment_proofs', $filename, 'public');
+        }
 
         $registration = DB::table('event_registrations')->insertGetId([
             'name'              => $validated['name'],
@@ -42,20 +51,15 @@ class EventRegistrationController extends Controller
             'illness'           => $validated['illness'],
             'shirt_size'        => $validated['shirt_size'],
             'payment_method'    => $validated['payment_method'],
-            'payment_status'    => 'pending',
+            'payment_status'    => 'uploaded',
+            'payment_proof_path'=> $paymentProofPath,
+            'payment_proof_filename' => $filename ?? null,
             'registration_code' => $registrationCode,
             'created_at'        => now(),
             'updated_at'        => now(),
         ]);
 
         // Data yang dikirim balik ke frontend
-        return redirect()->back()->with('registration', [
-            'registration_code' => $registrationCode,
-            'name'              => $validated['name'],
-            'email'             => $validated['email'],
-            'ticket_type'       => $validated['ticket_type'],
-            'ticket_price'      => $validated['ticket_price'],
-            'payment_proof_path'=> '/images/qrcode-dummy.png', // sementara
-        ]);
+        return redirect()->route('profile.edit')->with('success', 'Pendaftaran berhasil! Silakan tunggu verifikasi pembayaran.');
     }
 }

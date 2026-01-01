@@ -12,12 +12,22 @@ const form = useForm({
     shirt_size: '',
     ticket_type: '',
     ticket_price: 0,
+    payment_method: 'QRIS',
     transaction_id: '',
     payment_proof: null,
     agreement: false,
 })
 
 const selectedTicket = ref(null)
+
+const currentDate = computed(() => {
+    const today = new Date()
+    return today.toLocaleDateString('id-ID', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+    })
+})
 
 const tickets = [
     { name: 'Tiket Basic', price: 100000 },
@@ -29,6 +39,8 @@ const selectTicket = (ticket) => {
     form.ticket_type = ticket.name
     form.ticket_price = ticket.price
 }
+
+const showError = ref(false)
 
 const canSubmit = computed(() => {
     return (
@@ -45,11 +57,23 @@ const canSubmit = computed(() => {
 })
 
 const submit = () => {
-    if (!canSubmit.value) return
+    if (!canSubmit.value) {
+        showError.value = true
+        alert('Harap lengkapi semua field yang wajib diisi (ditandai dengan *)')
+        return
+    }
 
-    form.post('/event/register', {
+    showError.value = false
+    form.post('/event-registrations', {
         forceFormData: true,
         preserveScroll: true,
+        onSuccess: () => {
+            alert('Pendaftaran berhasil! Silakan cek email untuk konfirmasi.')
+        },
+        onError: (errors) => {
+            console.error('Submission errors:', errors)
+            alert('Terjadi kesalahan. Silakan cek kembali data Anda.')
+        }
     })
 }
 </script>
@@ -67,34 +91,44 @@ const submit = () => {
             <h2 class="section-title">Identitas Peserta</h2>
 
             <div class="card mb-12">
+                
+                <!-- ⚠️ PERHATIAN -->
+                <div class="bg-red-600 text-white rounded-lg p-4 text-sm mb-8">
+                    <p class="font-bold text-center mb-1">PERHATIAN!!!</p>
+                    <ol class="list-decimal list-inside">
+                        <li>Pastikan email yang diisikan benar</li>
+                        <li>Ruang penyimpanan email pastikan tidak penuh</li>
+                    </ol>
+                </div>
+
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <label class="label">Nama Lengkap</label>
-                        <input v-model="form.name" class="input" />
+                        <label class="label">Nama Lengkap <span class="text-red-600">*</span></label>
+                        <input v-model="form.name" class="input" required />
                     </div>
                     <div>
-                        <label class="label">NIK</label>
-                        <input v-model="form.nik" class="input" />
+                        <label class="label">NIK <span class="text-red-600">*</span></label>
+                        <input v-model="form.nik" class="input" required />
                     </div>
                     <div>
-                        <label class="label">Alamat</label>
-                        <input v-model="form.address" class="input" />
+                        <label class="label">Alamat <span class="text-red-600">*</span></label>
+                        <input v-model="form.address" class="input" required />
                     </div>
                     <div>
-                        <label class="label">Nomor HP</label>
-                        <input v-model="form.phone" class="input" />
+                        <label class="label">Nomor HP <span class="text-red-600">*</span></label>
+                        <input v-model="form.phone" class="input" required />
                     </div>
                     <div>
-                        <label class="label">Email</label>
-                        <input v-model="form.email" type="email" class="input" />
+                        <label class="label">Email <span class="text-red-600">*</span></label>
+                        <input v-model="form.email" type="email" class="input" required />
                     </div>
                     <div>
                         <label class="label">Riwayat Penyakit</label>
-                        <input v-model="form.illness" class="input" />
+                        <input v-model="form.illness" class="input" placeholder="Kosongkan jika tidak ada" />
                     </div>
                     <div class="md:col-span-2">
-                        <label class="label">Ukuran Jersey</label>
-                        <select v-model="form.shirt_size" class="input">
+                        <label class="label">Ukuran Jersey <span class="text-red-600">*</span></label>
+                        <select v-model="form.shirt_size" class="input" required>
                             <option disabled value="">Klik untuk Pilih Ukuran Jersey</option>
                             <option>M</option>
                             <option>L</option>
@@ -141,7 +175,7 @@ const submit = () => {
                     <div class="text-sm space-y-2">
                         <p class="font-semibold mb-2">Detail Transaksi</p>
                         <p>Payment Method : QRIS</p>
-                        <p>Tanggal : 2 Juli 2025</p>
+                        <p>Tanggal : {{ currentDate }}</p>
                         <p>Harga Tiket : Rp{{ form.ticket_price.toLocaleString('id-ID') }}</p>
                         <div class="border-t pt-2 font-bold">
                             Total Harga : Rp{{ form.ticket_price.toLocaleString('id-ID') }}
@@ -153,15 +187,6 @@ const submit = () => {
                     </div>
                 </div>
 
-                <!-- ⚠️ PERHATIAN -->
-                <div class="bg-red-600 text-white rounded-lg p-4 text-sm mb-8">
-                    <p class="font-bold text-center mb-1">PERHATIAN!!!</p>
-                    <ol class="list-decimal list-inside">
-                        <li>Pastikan email yang diisikan benar</li>
-                        <li>Ruang penyimpanan email pastikan tidak penuh</li>
-                    </ol>
-                </div>
-
                 <!-- ================= KONFIRMASI PEMBAYARANMU ================= -->
                 <div class="btn-orange mb-10 text-center">
                     Konfirmasi Pembayaranmu
@@ -170,18 +195,19 @@ const submit = () => {
                 <div class="space-y-4 mb-6">
                     <div>
                         <label class="label">ID Transaksional (Opsional)</label>
-                        <input v-model="form.transaction_id" class="input" />
+                        <input v-model="form.transaction_id" class="input" placeholder="Nomor referensi pembayaran (opsional)" />
                         <p class="text-xs text-gray-500 mt-1">
                             Nomor referensi membantu verifikasi pembayaran lebih cepat
                         </p>
                     </div>
 
                     <div>
-                        <label class="label">Bukti Pembayaran</label>
+                        <label class="label">Bukti Pembayaran <span class="text-red-600">*</span></label>
                         <input
                             type="file"
                             class="input"
-                            accept="image/png,image/jpeg"
+                            accept="image/png,image/jpeg,image/jpg"
+                            required
                             @change="e => form.payment_proof = e.target.files[0]"
                         />
                         <p class="text-xs text-gray-500 mt-1">
@@ -192,9 +218,9 @@ const submit = () => {
                     </div>
 
                     <label class="flex items-start gap-2 text-sm text-red-600 font-medium">
-                        <input type="checkbox" v-model="form.agreement" />
+                        <input type="checkbox" v-model="form.agreement" required class="mt-1" />
                         <span>
-                            Saya menyetujui bahwa informasi yang saya berikan adalah benar dan
+                            <span class="text-red-600">*</span> Saya menyetujui bahwa informasi yang saya berikan adalah benar dan
                             telah melakukan pembayaran sesuai jumlah yang tertera
                         </span>
                     </label>
