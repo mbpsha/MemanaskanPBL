@@ -50,8 +50,8 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
 
     Route::delete('/users/{user}', [AdminMonitoringUserController::class, 'destroy'])
         ->name('users.destroy');
-    
-            
+
+
     // Registration Management
     Route::get('/registrations', [RegistrationManagementController::class, 'index'])->name('registrations.index');
     Route::get('/registrations/{registration}', [RegistrationManagementController::class, 'show'])->name('registrations.show');
@@ -64,14 +64,15 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::get('/registrations/export/csv', [RegistrationManagementController::class, 'export'])->name('registrations.export');
 });
 
+// Event Registration (Public - No Auth Required)
+Route::get('/event-registrations', [EventRegistrationController::class, 'create'])->name('event.registrations');
+Route::post('/event-registrations', [EventRegistrationController::class, 'store'])->name('event.registrations.post');
+Route::post('/event/register', [EventRegistrationController::class, 'store'])->name('event.register'); // Alias for frontend
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-
-    Route::get('/event-registrations', [EventRegistrationController::class, 'create'])->name('event.registrations');
-    Route::post('/event-registrations', [EventRegistrationController::class, 'store'])->name('event.registrations.post');
 });
 
 require __DIR__ . '/auth.php';

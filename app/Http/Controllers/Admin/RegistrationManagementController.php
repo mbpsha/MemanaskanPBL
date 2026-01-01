@@ -101,6 +101,12 @@ class RegistrationManagementController extends Controller
             return back()->withErrors(['error' => 'Payment proof must be uploaded first.']);
         }
 
+        // Generate BIB number if not exists
+        if (!$registration->bib_number) {
+            $bib_number = $this->generateBibNumber($registration->gender);
+            $registration->bib_number = $bib_number;
+        }
+
         $registration->update([
             'payment_status' => 'verified',
             'payment_verified_at' => now(),
@@ -108,7 +114,7 @@ class RegistrationManagementController extends Controller
             'rejection_reason' => null,
         ]);
 
-        // Send email notification
+        // Send email notification with barcode
         try {
             Mail::to($registration->email)->send(new PaymentApprovedMail($registration));
         } catch (\Exception $e) {
@@ -116,7 +122,33 @@ class RegistrationManagementController extends Controller
             \Log::error('Failed to send payment approval email: ' . $e->getMessage());
         }
 
-        return back()->with('success', 'Payment approved and email sent to participant!');
+        return back()->with('success', 'Payment approved, BIB number assigned, and email sent to participant!');
+    }
+
+    /**
+     * Generate BIB number based on gender
+     * Format: M5001 (Male) or F5001 (Female)
+     * M/F = Gender, 5000 = 5K race, 001 = Sequential number
+     */
+    private function generateBibNumber($gender)
+    {
+        // Get the last BIB number for this gender
+        $lastRegistration = EventRegistration::where('gender', $gender)
+            ->whereNotNull('bib_number')
+            ->orderBy('bib_number', 'desc')
+            ->first();
+
+        if ($lastRegistration && $lastRegistration->bib_number) {
+            // Extract the number part (last 4 digits)
+            $lastNumber = (int) substr($lastRegistration->bib_number, -4);
+            $nextNumber = $lastNumber + 1;
+        } else {
+            // Start from 5001 for first participant
+            $nextNumber = 5001;
+        }
+
+        // Format: M5001 or F5001
+        return $gender . $nextNumber;
     }
 
     /**

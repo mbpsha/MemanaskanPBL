@@ -1,6 +1,6 @@
 <script setup>
 import { ref, computed } from "vue";
-import { useForm, Head, Link } from "@inertiajs/vue3";
+import { useForm, Head } from "@inertiajs/vue3";
 
 const form = useForm({
     name: "",
@@ -8,6 +8,7 @@ const form = useForm({
     address: "",
     phone: "",
     email: "",
+    gender: "",
     illness: "",
     shirt_size: "",
     ticket_type: "",
@@ -37,6 +38,7 @@ const canSubmit = computed(() => {
         form.address &&
         form.phone &&
         form.email &&
+        form.gender &&
         form.shirt_size &&
         form.ticket_type &&
         form.payment_proof &&
@@ -60,7 +62,6 @@ const submit = () => {
     <div
         class="min-h-screen bg-gradient-to-b from-[#EAF9FD] to-[#2DB7D2] py-10 px-4"
     >
-
         <div class="max-w-5xl mx-auto">
             <!-- LOGO -->
             <img src="/images/event run1.png" class="h-20 mx-auto mb-8" />
@@ -93,6 +94,14 @@ const submit = () => {
                             type="email"
                             class="input"
                         />
+                    </div>
+                    <div>
+                        <label class="label">Jenis Kelamin</label>
+                        <select v-model="form.gender" class="input">
+                            <option disabled value="">Pilih Jenis Kelamin</option>
+                            <option value="M">Laki-laki</option>
+                            <option value="F">Perempuan</option>
+                        </select>
                     </div>
                     <div>
                         <label class="label">Riwayat Penyakit</label>
