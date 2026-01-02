@@ -26,12 +26,31 @@ class PaymentApprovedMail extends Mailable
 
         // Generate barcode image (Code 128 format)
         try {
-            $generator = new BarcodeGeneratorPNG();
-            $this->barcodeImage = base64_encode(
-                $generator->getBarcode($registration->registration_code, $generator::TYPE_CODE_128)
-            );
+            // Try local generation first if GD is available
+            if (extension_loaded('gd') && function_exists('imagecreate')) {
+                $generator = new BarcodeGeneratorPNG();
+                $this->barcodeImage = base64_encode(
+                    $generator->getBarcode($registration->registration_code, $generator::TYPE_CODE_128)
+                );
+            } else {
+                // Fallback: Use external barcode API
+                \Log::info('Using external barcode API as fallback');
+                $barcodeUrl = 'https://barcode.tec-it.com/barcode.ashx?data=' . urlencode($registration->registration_code) . '&code=Code128&translate-esc=on&dpi=96&imagetype=png';
+
+                // Fetch barcode from external API
+                $barcodeData = @file_get_contents($barcodeUrl);
+
+                if ($barcodeData !== false) {
+                    $this->barcodeImage = base64_encode($barcodeData);
+                    \Log::info('Barcode generated successfully using external API');
+                } else {
+                    throw new \Exception('Failed to fetch barcode from external API');
+                }
+            }
         } catch (\Exception $e) {
             \Log::error('Failed to generate barcode: ' . $e->getMessage());
+            \Log::error('GD loaded: ' . (extension_loaded('gd') ? 'yes' : 'no'));
+            \Log::error('GD functions: ' . (function_exists('imagecreate') ? 'yes' : 'no'));
             $this->barcodeImage = null;
         }
     }

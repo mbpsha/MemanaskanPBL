@@ -1,6 +1,6 @@
 <script setup>
 import { ref, computed } from 'vue'
-import { useForm, Head } from '@inertiajs/vue3'
+import { useForm, Head, Link } from '@inertiajs/vue3'
 
 const form = useForm({
     name: '',
@@ -8,27 +8,40 @@ const form = useForm({
     address: '',
     phone: '',
     email: '',
+    gender: '',
     illness: '',
     shirt_size: '',
     ticket_type: '',
     ticket_price: 0,
+    payment_method: 'QRIS',
     transaction_id: '',
     payment_proof: null,
     agreement: false,
-});
+})
 
 const selectedTicket = ref(null)
 
+const currentDate = computed(() => {
+    const today = new Date()
+    return today.toLocaleDateString('id-ID', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+    })
+})
+
 const tickets = [
-    { name: "Tiket Basic", price: 100000 },
-    { name: "Tiket Fun Run + Support Syiar Ramadan", price: 130000 },
-];
+    { name: 'Tiket Basic', price: 100000 },
+    { name: 'Tiket Fun Run + Support Syiar Ramadan', price: 130000 },
+]
 
 const selectTicket = (ticket) => {
     selectedTicket.value = ticket.name
     form.ticket_type = ticket.name
     form.ticket_price = ticket.price
 }
+
+const showError = ref(false)
 
 const canSubmit = computed(() => {
     return (
@@ -42,15 +55,27 @@ const canSubmit = computed(() => {
         form.ticket_type &&
         form.payment_proof &&
         form.agreement
-    );
-});
+    )
+})
 
 const submit = () => {
-    if (!canSubmit.value) return
+    if (!canSubmit.value) {
+        showError.value = true
+        alert('Harap lengkapi semua field yang wajib diisi (ditandai dengan *)')
+        return
+    }
 
-    form.post('/event/register', {
+    showError.value = false
+    form.post('/event-registrations', {
         forceFormData: true,
         preserveScroll: true,
+        onSuccess: () => {
+            alert('Pendaftaran berhasil! Silakan cek email untuk konfirmasi.')
+        },
+        onError: (errors) => {
+            console.error('Submission errors:', errors)
+            alert('Terjadi kesalahan. Silakan cek kembali data Anda.')
+        }
     })
 }
 </script>
@@ -58,10 +83,9 @@ const submit = () => {
 <template>
     <Head title="Form Pendaftaran Event" />
 
-    <div
-        class="min-h-screen bg-gradient-to-b from-[#EAF9FD] to-[#2DB7D2] py-10 px-4"
-    >
+    <div class="min-h-screen bg-gradient-to-b from-[#EAF9FD] to-[#2DB7D2] py-10 px-4">
         <div class="max-w-5xl mx-auto">
+
             <!-- LOGO -->
             <img src="/images/event run1.png" class="h-20 mx-auto mb-8" />
 
@@ -97,16 +121,25 @@ const submit = () => {
                         <input v-model="form.phone" class="input" required />
                     </div>
                     <div>
-                        <label class="label">Email</label>
-                        <input v-model="form.email" type="email" class="input" />
+                        <label class="label">Email <span class="text-red-600">*</span></label>
+                        <input v-model="form.email" type="email" class="input" required />
+                    </div>
+                    <!-- Gender -->
+                    <div>
+                        <label class="label">Gender <span class="text-red-600">*</span></label>
+                        <select v-model="form.gender" class="input" required>
+                            <option disabled value="">Pilih Gender</option>
+                            <option value="M">Laki-Laki</option>
+                            <option value="F">Perempuan</option>
+                        </select>
                     </div>
                     <div>
                         <label class="label">Riwayat Penyakit</label>
                         <input v-model="form.illness" class="input" placeholder="Kosongkan jika tidak ada" />
                     </div>
                     <div class="md:col-span-2">
-                        <label class="label">Ukuran Jersey</label>
-                        <select v-model="form.shirt_size" class="input">
+                        <label class="label">Ukuran Jersey <span class="text-red-600">*</span></label>
+                        <select v-model="form.shirt_size" class="input" required>
                             <option disabled value="">Klik untuk Pilih Ukuran Jersey</option>
                             <option>M</option>
                             <option>L</option>
@@ -133,14 +166,12 @@ const submit = () => {
                             'ticket-box',
                             selectedTicket === ticket.name
                                 ? 'ticket-active'
-                                : 'ticket-inactive',
+                                : 'ticket-inactive'
                         ]"
                     >
-                        <div class="font-semibold text-center">
-                            {{ ticket.name }}
-                        </div>
+                        <div class="font-semibold text-center">{{ ticket.name }}</div>
                         <div class="text-sm text-center">
-                            Rp{{ ticket.price.toLocaleString("id-ID") }},-
+                            Rp{{ ticket.price.toLocaleString('id-ID') }},-
                         </div>
                     </button>
                 </div>
@@ -151,18 +182,14 @@ const submit = () => {
                 </div>
 
                 <!-- DETAIL TRANSAKSI -->
-                <div
-                    class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center mb-10"
-                >
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center mb-10">
                     <div class="text-sm space-y-2">
                         <p class="font-semibold mb-2">Detail Transaksi</p>
                         <p>Payment Method : QRIS</p>
-                        <p>Tanggal : 2 Juli 2025</p>
+                        <p>Tanggal : {{ currentDate }}</p>
                         <p>Harga Tiket : Rp{{ form.ticket_price.toLocaleString('id-ID') }}</p>
                         <div class="border-t pt-2 font-bold">
-                            Total Harga : Rp{{
-                                form.ticket_price.toLocaleString("id-ID")
-                            }}
+                            Total Harga : Rp{{ form.ticket_price.toLocaleString('id-ID') }}
                         </div>
                     </div>
 
@@ -181,8 +208,7 @@ const submit = () => {
                         <label class="label">ID Transaksional (Opsional)</label>
                         <input v-model="form.transaction_id" class="input" placeholder="Nomor referensi pembayaran (opsional)" />
                         <p class="text-xs text-gray-500 mt-1">
-                            Nomor referensi membantu verifikasi pembayaran lebih
-                            cepat
+                            Nomor referensi membantu verifikasi pembayaran lebih cepat
                         </p>
                     </div>
 
@@ -191,20 +217,21 @@ const submit = () => {
                         <input
                             type="file"
                             class="input"
-                            accept="image/png,image/jpeg"
+                            accept="image/png,image/jpeg,image/jpg"
+                            required
                             @change="e => form.payment_proof = e.target.files[0]"
                         />
                         <p class="text-xs text-gray-500 mt-1">
-                            • Format JPG, PNG, JPEG <br />
-                            • Maksimal ukuran: 5 Mb <br />
+                            • Format JPG, PNG, JPEG <br>
+                            • Maksimal ukuran: 5 Mb <br>
                             • Pastikan bukti pembayaran jelas dan dapat dibaca
                         </p>
                     </div>
 
                     <label class="flex items-start gap-2 text-sm text-red-600 font-medium">
-                        <input type="checkbox" v-model="form.agreement" />
+                        <input type="checkbox" v-model="form.agreement" required class="mt-1" />
                         <span>
-                            Saya menyetujui bahwa informasi yang saya berikan adalah benar dan
+                            <span class="text-red-600">*</span> Saya menyetujui bahwa informasi yang saya berikan adalah benar dan
                             telah melakukan pembayaran sesuai jumlah yang tertera
                         </span>
                     </label>
@@ -222,6 +249,7 @@ const submit = () => {
                     Kembali ke Halaman Utama
                 </Link>
             </div>
+
         </div>
     </div>
 </template>

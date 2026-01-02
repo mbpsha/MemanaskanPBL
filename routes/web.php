@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\RegistrationController;
 use App\Http\Controllers\Admin\RegistrationManagementController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\PaymentVerificationController;
+use App\Http\Controllers\Admin\RacepackController;
 use App\Http\Controllers\EventRegistrationController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
@@ -14,6 +15,12 @@ use Inertia\Inertia;
 Route::get('/', function () {
     return Inertia::render('Landing');
 });
+
+// Dashboard - redirect to landing page
+Route::get('/dashboard', function () {
+    return redirect('/');
+})->middleware(['auth'])->name('dashboard');
+
 
 // Event Registration API
 Route::prefix('api')->group(function () {
@@ -52,6 +59,9 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
 
     // Export
     Route::get('/registrations/export/csv', [RegistrationManagementController::class, 'export'])->name('registrations.export');
+
+    // Racepack Collection
+    Route::post('/racepack/scan', [RacepackController::class, 'updateStatus'])->name('racepack.scan');
 });
 
 Route::middleware('auth')->group(function () {
