@@ -3,6 +3,8 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Api\RegistrationController;
 use App\Http\Controllers\Admin\RegistrationManagementController;
+use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\PaymentVerificationController;
 use App\Http\Controllers\EventRegistrationController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
@@ -29,6 +31,17 @@ Route::prefix('api')->group(function () {
 });
 
 Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
+    // User Management
+    Route::get('/users', [UserController::class, 'index'])->name('users.index');
+    Route::post('/users', [UserController::class, 'store'])->name('users.store');
+    Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');
+    Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
+
+    // Payment Verification
+    Route::get('/payments', [PaymentVerificationController::class, 'index'])->name('payments.index');
+    Route::post('/payments/{payment}/status', [PaymentVerificationController::class, 'updateStatus'])->name('payments.updateStatus');
+    Route::get('/payments/{payment}/proof', [PaymentVerificationController::class, 'getPaymentProof'])->name('payments.proof');
+
     // Registration Management
     Route::get('/registrations', [RegistrationManagementController::class, 'index'])->name('registrations.index');
     Route::get('/registrations/{registration}', [RegistrationManagementController::class, 'show'])->name('registrations.show');

@@ -28,27 +28,27 @@ const submit = () => {
 <template>
     <Head title="Sign Up" />
 
-    <div class="min-h-screen flex items-center justify-center bg-[#1e2a4a] px-4">
+    <div class="min-h-screen bg-[#1F2944] flex items-center justify-center px-4">
         <div class="w-full max-w-md">
 
             <!-- Title -->
-            <h1 class="text-center text-white text-4xl font-bold mb-8">
+            <h1 class="text-3xl font-bold text-white text-center mb-8">
                 SIGN UP HERE
             </h1>
 
-            <!-- Switch Button -->
-            <div class="flex mb-6 rounded-lg overflow-hidden shadow-md">
+            <!-- Tab Navigation -->
+            <div class="grid grid-cols-2 gap-0 mb-6">
                 <Link
                     href="/login"
-                    class="w-1/2 py-3 text-center bg-gray-200 text-black font-bold hover:bg-gray-300 transition"
+                    class="bg-gray-200 text-gray-800 py-3 font-semibold hover:bg-gray-300 transition text-center"
                 >
                     LOGIN
                 </Link>
-                <div
-                    class="w-1/2 py-3 text-center bg-[#3d4f91] text-white font-bold"
+                <button
+                    class="bg-[#3d4f91] text-white py-3 font-semibold"
                 >
                     SIGN UP
-                </div>
+                </button>
             </div>
 
             <!-- Form -->
@@ -59,8 +59,7 @@ const submit = () => {
                     v-model="form.name"
                     type="text"
                     placeholder="Masukkan Username"
-                    class="w-full px-4 py-3 rounded-md bg-gray-200 focus:outline-none
-                           transition focus:ring-2 focus:ring-[#3d4f91]"
+                    class="w-full px-4 py-3 rounded-lg bg-gray-200 focus:outline-none focus:ring-2 focus:ring-[#3d4f91]"
                     required
                 />
 
@@ -69,8 +68,7 @@ const submit = () => {
                     v-model="form.email"
                     type="email"
                     placeholder="Masukkan Email"
-                    class="w-full px-4 py-3 rounded-md bg-gray-200 focus:outline-none
-                           transition focus:ring-2 focus:ring-[#3d4f91]"
+                    class="w-full px-4 py-3 rounded-lg bg-gray-200 focus:outline-none focus:ring-2 focus:ring-[#3d4f91]"
                     required
                 />
 
@@ -80,15 +78,13 @@ const submit = () => {
                         v-model="form.password"
                         :type="showPassword ? 'text' : 'password'"
                         placeholder="Masukkan Password"
-                        class="w-full px-4 py-3 pr-12 rounded-md bg-gray-200 focus:outline-none
-                               transition focus:ring-2 focus:ring-[#3d4f91]"
+                        class="w-full px-4 py-3 pr-12 rounded-lg bg-gray-200 focus:outline-none focus:ring-2 focus:ring-[#3d4f91]"
                         required
                     />
                     <button
                         type="button"
                         @click="showPassword = !showPassword"
-                        class="absolute inset-y-0 right-4 flex items-center
-                               text-gray-600 hover:text-gray-800"
+                        class="absolute inset-y-0 right-4 flex items-center text-gray-600 hover:text-gray-800"
                         tabindex="-1"
                     >
                         <EyeSlashIcon v-if="showPassword" class="w-5 h-5" />
@@ -102,15 +98,13 @@ const submit = () => {
                         v-model="form.password_confirmation"
                         :type="showConfirmPassword ? 'text' : 'password'"
                         placeholder="Konfirmasi Password"
-                        class="w-full px-4 py-3 pr-12 rounded-md bg-gray-200 focus:outline-none
-                               transition focus:ring-2 focus:ring-[#3d4f91]"
+                        class="w-full px-4 py-3 pr-12 rounded-lg bg-gray-200 focus:outline-none focus:ring-2 focus:ring-[#3d4f91]"
                         required
                     />
                     <button
                         type="button"
                         @click="showConfirmPassword = !showConfirmPassword"
-                        class="absolute inset-y-0 right-4 flex items-center
-                               text-gray-600 hover:text-gray-800"
+                        class="absolute inset-y-0 right-4 flex items-center text-gray-600 hover:text-gray-800"
                         tabindex="-1"
                     >
                         <EyeSlashIcon v-if="showConfirmPassword" class="w-5 h-5" />
@@ -121,11 +115,10 @@ const submit = () => {
                 <!-- Submit -->
                 <button
                     type="submit"
-                    class="w-full bg-[#3d4f91] text-white py-3 rounded-md font-semibold
-                           hover:bg-[#34437a] transition active:scale-[0.98]"
+                    class="w-full bg-[#3d4f91] hover:bg-[#34437a] text-white py-3 rounded-lg font-semibold transition disabled:opacity-50"
                     :disabled="form.processing"
                 >
-                    SIGN UP
+                    {{ form.processing ? 'Loading...' : 'SIGN UP' }}
                 </button>
             </form>
 

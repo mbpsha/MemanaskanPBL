@@ -1,6 +1,6 @@
 <script setup>
 import { ref, computed } from 'vue'
-import { useForm, Head } from '@inertiajs/vue3'
+import { useForm, Head, Link } from '@inertiajs/vue3'
 
 const form = useForm({
     name: '',
@@ -8,6 +8,7 @@ const form = useForm({
     address: '',
     phone: '',
     email: '',
+    gender: '',
     illness: '',
     shirt_size: '',
     ticket_type: '',
@@ -49,6 +50,7 @@ const canSubmit = computed(() => {
         form.address &&
         form.phone &&
         form.email &&
+        form.gender &&
         form.shirt_size &&
         form.ticket_type &&
         form.payment_proof &&
@@ -121,6 +123,15 @@ const submit = () => {
                     <div>
                         <label class="label">Email <span class="text-red-600">*</span></label>
                         <input v-model="form.email" type="email" class="input" required />
+                    </div>
+                    <!-- Gender -->
+                    <div>
+                        <label class="label">Gender <span class="text-red-600">*</span></label>
+                        <select v-model="form.gender" class="input" required>
+                            <option disabled value="">Pilih Gender</option>
+                            <option value="Male">Laki-Laki</option>
+                            <option value="Female">Perempuan</option>
+                        </select>
                     </div>
                     <div>
                         <label class="label">Riwayat Penyakit</label>
@@ -233,6 +244,10 @@ const submit = () => {
                 >
                     Konfirmasi Pembayaran
                 </button>
+
+                <Link href="/" class="block mt-4 w-full py-3 rounded-xl font-semibold text-[#1FB5D5] bg-white border-2 border-[#1FB5D5] hover:bg-[#1FB5D5] hover:text-white transition-all duration-300 text-center">
+                    Kembali ke Halaman Utama
+                </Link>
             </div>
 
         </div>

@@ -5,10 +5,10 @@
             
             <!-- Tab Navigation -->
             <div class="grid grid-cols-2 gap-0 mb-6">
-                <button class="bg-[#5865aa] text-white py-3 font-semibold rounded-l-lg">
+                <button class="bg-[#3d4f91] text-white py-3 font-semibold">
                     LOGIN
                 </button>
-                <Link href="/register" class="bg-gray-200 text-gray-800 py-3 font-semibold rounded-r-lg hover:bg-gray-300 transition text-center">
+                <Link href="/register" class="bg-gray-200 text-gray-800 py-3 font-semibold hover:bg-gray-300 transition text-center">
                     SIGN UP
                 </Link>
             </div>
@@ -17,10 +17,10 @@
             <form @submit.prevent="handleLogin" class="space-y-4">
                 <div>
                     <input 
-                        type="email" 
+                        type="text" 
                         v-model="form.email"
-                        placeholder="Masukkan Email" 
-                        class="w-full px-4 py-3 rounded-lg border-0 focus:ring-2 focus:ring-blue-500 outline-none"
+                        placeholder="Masukkan Email atau Username" 
+                        class="w-full px-4 py-3 rounded-lg bg-gray-200 focus:outline-none focus:ring-2 focus:ring-[#3d4f91]"
                         :class="{ 'ring-2 ring-red-500': form.errors.email }"
                         required
                     />
@@ -32,7 +32,7 @@
                         type="password" 
                         v-model="form.password"
                         placeholder="Masukkan Password" 
-                        class="w-full px-4 py-3 rounded-lg border-0 focus:ring-2 focus:ring-blue-500 outline-none"
+                        class="w-full px-4 py-3 rounded-lg bg-gray-200 focus:outline-none focus:ring-2 focus:ring-[#3d4f91]"
                         :class="{ 'ring-2 ring-red-500': form.errors.password }"
                         required
                     />
@@ -42,7 +42,7 @@
                 <button 
                     type="submit"
                     :disabled="form.processing"
-                    class="w-full bg-[#5865aa] hover:bg-[#4a5590] text-white py-3 rounded-lg font-semibold transition disabled:opacity-50"
+                    class="w-full bg-[#3d4f91] hover:bg-[#34437a] text-white py-3 rounded-lg font-semibold transition disabled:opacity-50"
                 >
                     {{ form.processing ? 'Loading...' : 'LOGIN' }}
                 </button>
