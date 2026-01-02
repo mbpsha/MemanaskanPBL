@@ -3,9 +3,9 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Api\RegistrationController;
 use App\Http\Controllers\Admin\RegistrationManagementController;
+use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\PaymentVerificationController;
 use App\Http\Controllers\EventRegistrationController;
-use App\Http\Controllers\Admin\AdminMonitoringUserController;
-use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -14,12 +14,6 @@ use Inertia\Inertia;
 Route::get('/', function () {
     return Inertia::render('Landing');
 });
-
-// Dashboard
-Route::get('/dashboard', function () {
-    // After login/register, redirect to landing page
-    return redirect('/');
-})->middleware(['auth', 'verified'])->name('dashboard');
 
 // Event Registration API
 Route::prefix('api')->group(function () {
@@ -36,21 +30,17 @@ Route::prefix('api')->group(function () {
     Route::get('/registrations', [RegistrationController::class, 'index']);
 });
 
-
 Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
-    // User Monitoring
-    Route::get('/users', [AdminMonitoringUserController::class, 'index'])
-        ->name('users');
+    // User Management
+    Route::get('/users', [UserController::class, 'index'])->name('users.index');
+    Route::post('/users', [UserController::class, 'store'])->name('users.store');
+    Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');
+    Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
 
-    Route::post('/users', [AdminMonitoringUserController::class, 'store'])
-        ->name('users.store');
-
-    Route::put('/users/{user}', [AdminMonitoringUserController::class, 'update'])
-        ->name('users.update');
-
-    Route::delete('/users/{user}', [AdminMonitoringUserController::class, 'destroy'])
-        ->name('users.destroy');
-
+    // Payment Verification
+    Route::get('/payments', [PaymentVerificationController::class, 'index'])->name('payments.index');
+    Route::post('/payments/{payment}/status', [PaymentVerificationController::class, 'updateStatus'])->name('payments.updateStatus');
+    Route::get('/payments/{payment}/proof', [PaymentVerificationController::class, 'getPaymentProof'])->name('payments.proof');
 
     // Registration Management
     Route::get('/registrations', [RegistrationManagementController::class, 'index'])->name('registrations.index');
@@ -64,15 +54,13 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::get('/registrations/export/csv', [RegistrationManagementController::class, 'export'])->name('registrations.export');
 });
 
-// Event Registration (Public - No Auth Required)
-Route::get('/event-registrations', [EventRegistrationController::class, 'create'])->name('event.registrations');
-Route::post('/event-registrations', [EventRegistrationController::class, 'store'])->name('event.registrations.post');
-Route::post('/event/register', [EventRegistrationController::class, 'store'])->name('event.register'); // Alias for frontend
-
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    Route::get('/event-registrations', [EventRegistrationController::class, 'create'])->name('event.registrations');
+    Route::post('/event-registrations', [EventRegistrationController::class, 'store'])->name('event.registrations.post');
 });
 
 require __DIR__ . '/auth.php';

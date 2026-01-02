@@ -49,6 +49,14 @@ class EventRegistration extends Model
     }
 
     /**
+     * Relationship to user who owns this registration
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'email', 'email');
+    }
+
+    /**
      * Relationship to admin who verified payment
      */
     public function verifier()

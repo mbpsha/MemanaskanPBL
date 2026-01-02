@@ -35,9 +35,9 @@ import { UsersIcon, CreditCardIcon, ArrowRightOnRectangleIcon } from '@heroicons
       href="/logout"
       method="post"
       as="button"
-      class="mt-auto flex items-center gap-2 text-red-500"
+      class="mt-auto flex items-center gap-2 text-red-500 hover:bg-red-50 px-4 py-2 rounded-lg transition"
     >
-      <ArrowRightOnRectangleIcon class="w-5 h-5 text-gray-600" />
+      <ArrowRightOnRectangleIcon class="w-5 h-5" />
       Log-out
     </Link>
   </aside>

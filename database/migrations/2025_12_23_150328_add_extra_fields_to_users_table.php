@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('phone')->nullable()->after('role');
             $table->date('birth_date')->nullable()->after('phone');
             $table->text('address')->nullable()->after('birth_date');
+            $table->enum('gender', ['Male', 'Female'])->after('address');
         });
     }
 
@@ -25,7 +26,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn(['role', 'phone', 'birth_date', 'address']);
+            $table->dropColumn(['role', 'phone', 'birth_date', 'address', 'gender']);
         });
     }
 };
