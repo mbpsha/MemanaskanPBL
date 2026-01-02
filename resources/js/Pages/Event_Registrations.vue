@@ -9,6 +9,7 @@ const form = useForm({
     phone: "",
     email: "",
     illness: "",
+    gender: "",
     shirt_size: "",
     ticket_type: "",
     ticket_price: 0,
@@ -37,6 +38,7 @@ const canSubmit = computed(() => {
         form.address &&
         form.phone &&
         form.email &&
+        form.gender &&
         form.shirt_size &&
         form.ticket_type &&
         form.payment_proof &&
@@ -60,7 +62,6 @@ const submit = () => {
     <div
         class="min-h-screen bg-gradient-to-b from-[#EAF9FD] to-[#2DB7D2] py-10 px-4"
     >
-
         <div class="max-w-5xl mx-auto">
             <!-- LOGO -->
             <img src="/images/event run1.png" class="h-20 mx-auto mb-8" />
@@ -68,8 +69,8 @@ const submit = () => {
             <!-- ================= IDENTITAS PESERTA ================= -->
             <h2 class="section-title">Identitas Peserta</h2>
 
-            <div class="card mb-12">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="mb-12 card">
+                <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
                     <div>
                         <label class="label">Nama Lengkap</label>
                         <input v-model="form.name" class="input" />
@@ -98,11 +99,22 @@ const submit = () => {
                         <label class="label">Riwayat Penyakit</label>
                         <input v-model="form.illness" class="input" />
                     </div>
-                    <div class="md:col-span-2">
+                    <!-- Gender -->
+                    <div>
+                        <label class="label">Gender</label>
+                        <select v-model="form.gender" class="input">
+                            <option disabled value="">Pilih Gender</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                        </select>
+                    </div>
+
+                    <!-- Ukuran Jersey -->
+                    <div>
                         <label class="label">Ukuran Jersey</label>
                         <select v-model="form.shirt_size" class="input">
                             <option disabled value="">
-                                Klik untuk Pilih Ukuran Jersey
+                                Pilih Ukuran Jersey
                             </option>
                             <option>M</option>
                             <option>L</option>
@@ -115,11 +127,11 @@ const submit = () => {
             <!-- ================= HALAMAN PEMBAYARAN ================= -->
             <h2 class="section-title">Halaman Pembayaran</h2>
 
-            <div class="card mb-12">
-                <h3 class="text-center font-bold text-lg mb-6">Jenis Ticket</h3>
+            <div class="mb-12 card">
+                <h3 class="mb-6 text-lg font-bold text-center">Jenis Ticket</h3>
 
                 <!-- TIKET -->
-                <div class="flex justify-center gap-6 flex-wrap mb-8">
+                <div class="flex flex-wrap justify-center gap-6 mb-8">
                     <button
                         v-for="ticket in tickets"
                         :key="ticket.name"
@@ -142,16 +154,16 @@ const submit = () => {
                 </div>
 
                 <!-- SELESAIKAN PEMBAYARAN -->
-                <div class="btn-orange mb-10 text-center">
+                <div class="mb-10 text-center btn-orange">
                     Selesaikan Pembayaranmu
                 </div>
 
                 <!-- DETAIL TRANSAKSI -->
                 <div
-                    class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center mb-10"
+                    class="grid items-center grid-cols-1 gap-8 mb-10 md:grid-cols-2"
                 >
-                    <div class="text-sm space-y-2">
-                        <p class="font-semibold mb-2">Detail Transaksi</p>
+                    <div class="space-y-2 text-sm">
+                        <p class="mb-2 font-semibold">Detail Transaksi</p>
                         <p>Payment Method : QRIS</p>
                         <p>Tanggal : 2 Juli 2025</p>
                         <p>
@@ -159,7 +171,7 @@ const submit = () => {
                                 form.ticket_price.toLocaleString("id-ID")
                             }}
                         </p>
-                        <div class="border-t pt-2 font-bold">
+                        <div class="pt-2 font-bold border-t">
                             Total Harga : Rp{{
                                 form.ticket_price.toLocaleString("id-ID")
                             }}
@@ -172,8 +184,8 @@ const submit = () => {
                 </div>
 
                 <!-- ⚠️ PERHATIAN -->
-                <div class="bg-red-600 text-white rounded-lg p-4 text-sm mb-8">
-                    <p class="font-bold text-center mb-1">PERHATIAN!!!</p>
+                <div class="p-4 mb-8 text-sm text-white bg-red-600 rounded-lg">
+                    <p class="mb-1 font-bold text-center">PERHATIAN!!!</p>
                     <ol class="list-decimal list-inside">
                         <li>Pastikan email yang diisikan benar</li>
                         <li>Ruang penyimpanan email pastikan tidak penuh</li>
@@ -181,15 +193,15 @@ const submit = () => {
                 </div>
 
                 <!-- ================= KONFIRMASI PEMBAYARANMU ================= -->
-                <div class="btn-orange mb-10 text-center">
+                <div class="mb-10 text-center btn-orange">
                     Konfirmasi Pembayaranmu
                 </div>
 
-                <div class="space-y-4 mb-6">
+                <div class="mb-6 space-y-4">
                     <div>
                         <label class="label">ID Transaksional (Opsional)</label>
                         <input v-model="form.transaction_id" class="input" />
-                        <p class="text-xs text-gray-500 mt-1">
+                        <p class="mt-1 text-xs text-gray-500">
                             Nomor referensi membantu verifikasi pembayaran lebih
                             cepat
                         </p>
@@ -205,7 +217,7 @@ const submit = () => {
                                 (e) => (form.payment_proof = e.target.files[0])
                             "
                         />
-                        <p class="text-xs text-gray-500 mt-1">
+                        <p class="mt-1 text-xs text-gray-500">
                             • Format JPG, PNG, JPEG <br />
                             • Maksimal ukuran: 5 Mb <br />
                             • Pastikan bukti pembayaran jelas dan dapat dibaca
@@ -213,7 +225,7 @@ const submit = () => {
                     </div>
 
                     <label
-                        class="flex items-start gap-2 text-sm text-red-600 font-medium"
+                        class="flex items-start gap-2 text-sm font-medium text-red-600"
                     >
                         <input type="checkbox" v-model="form.agreement" />
                         <span>
@@ -231,6 +243,9 @@ const submit = () => {
                 >
                     Konfirmasi Pembayaran
                 </button>
+                <Link href="/" class="btn-back">
+                    Kembali ke Halaman Utama
+                </Link>
             </div>
         </div>
     </div>
@@ -275,5 +290,13 @@ const submit = () => {
 .btn-submit {
     @apply w-full py-3 rounded-xl font-semibold text-white
     bg-[#1FB5D5] hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed;
+}
+
+.btn-back {
+    @apply w-full py-3 rounded-xl font-semibold text-center
+    bg-orange-400 text-white
+    hover:bg-orange-600
+    transition
+    mt-4;
 }
 </style>
