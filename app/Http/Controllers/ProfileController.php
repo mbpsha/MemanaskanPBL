@@ -18,9 +18,15 @@ class ProfileController extends Controller
      */
     public function edit(Request $request): Response
     {
-        return Inertia::render('Profile/Edit', [
-            'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
-            'status' => session('status'),
+        $user = $request->user();
+        
+        // Get user's event registrations
+        $eventRegistrations = $user->eventRegistrations()->get();
+        
+        return Inertia::render('Profile', [
+            'user' => $user,
+            'eventRegistrations' => $eventRegistrations,
+            'hasRegistrations' => $eventRegistrations->isNotEmpty(),
         ]);
     }
 

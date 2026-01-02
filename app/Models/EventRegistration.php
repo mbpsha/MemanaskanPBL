@@ -16,6 +16,7 @@ class EventRegistration extends Model
         'address',
         'phone',
         'email',
+        'gender',
         'illness',
         'shirt_size',
         'payment_method',
@@ -26,6 +27,7 @@ class EventRegistration extends Model
         'verified_by',
         'rejection_reason',
         'registration_code',
+        'bib_number',
     ];
 
     protected $casts = [
@@ -44,6 +46,14 @@ class EventRegistration extends Model
                 $registration->registration_code = 'REG-' . strtoupper(Str::random(10));
             }
         });
+    }
+
+    /**
+     * Relationship to user who owns this registration
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'email', 'email');
     }
 
     /**

@@ -16,7 +16,7 @@ class AuthenticatedSessionController extends Controller
 
     public function create(): Response
     {
-        return Inertia::render('Login');
+        return Inertia::render('Auth/Login');
     }
 
     public function store(LoginRequest $request): RedirectResponse
@@ -27,7 +27,7 @@ class AuthenticatedSessionController extends Controller
 
         // Redirect to admin if user is admin, otherwise to home
         if (Auth::user()->role === 'admin') {
-            return redirect()->intended('/admin/registrations');
+            return redirect()->intended('/admin/users');
         }
 
         return redirect()->intended('/');

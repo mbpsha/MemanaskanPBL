@@ -71,7 +71,7 @@ const verificationLinkSent = computed(
 
             <!-- Logout -->
             <Link
-                :href="route('logout')"
+                href="/logout"
                 method="post"
                 as="button"
                 class="w-full bg-[#F58B1D] hover:bg-[#e07c14] text-white py-3 rounded-md font-semibold transition"

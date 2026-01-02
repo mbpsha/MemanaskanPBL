@@ -136,4 +136,89 @@ const filteredUsers = computed(() => {
             </table>
         </div>
     </div>
+<<<<<<< HEAD
 </template>
+=======
+
+
+    <!-- TABLE -->
+    <div class="overflow-x-auto">
+      <table class="w-full border-collapse min-h-[150px]">
+        <thead>
+          <tr class="border-b text-sm text-gray-500">
+            <th class="py-4 text-left font-medium">Username</th>
+            <th class="text-left font-medium">Email</th>
+            <th class="text-left font-medium">Role</th>
+            <th class="text-center font-medium">Aksi</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr
+            v-for="user in filteredUsers"
+            :key="user.id"
+            class="border-b last:border-none hover:bg-gray-50 transition"
+          >
+            <td class="py-5 font-medium text-gray-800">
+              {{ user.name }}
+            </td>
+
+            <td class="text-gray-500">
+              {{ user.email }}
+            </td>
+
+            <td>
+              <span
+                v-if="user.role === 'admin'"
+                class="inline-block px-4 py-1 text-sm
+                       text-red-600 bg-red-100 rounded-lg"
+              >
+                Admin
+              </span>
+
+              <span
+                v-else
+                class="inline-block px-4 py-1 text-sm
+                       text-blue-600 bg-blue-100 rounded-lg"
+              >
+                User
+              </span>
+            </td>
+
+            <td class="text-center">
+              <div class="flex justify-center gap-4">
+                <button
+                  @click="emit('edit', user)"
+                  class="text-gray-500 hover:text-blue-600 transition"
+                  title="Edit user"
+                >
+                  <PencilSquareIcon class="w-5 h-5" />
+                </button>
+
+                <button
+                  @click="emit('delete', user)"
+                  class="text-gray-500 hover:text-red-600 transition"
+                  title="Hapus user"
+                >
+                  <TrashIcon class="w-5 h-5" />
+                </button>
+              </div>
+            </td>
+          </tr>
+
+          <!-- EMPTY STATE -->
+          <tr v-if="filteredUsers.length === 0">
+            <td
+              colspan="4"
+              class="py-10 text-center text-gray-400"
+            >
+              Data tidak ditemukan
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</template>
+>>>>>>> dd0cf2d59a7d21d887e90d5a7e9c27f20c955594
