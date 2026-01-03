@@ -23,21 +23,6 @@ class EventRegistrationController extends Controller
      */
     public function store(Request $request)
     {
-<<<<<<< HEAD
-        $validated = $request->validate([
-            'name'          => 'required|string|max:255',
-            'nik'           => 'required|string|max:20',
-            'address'       => 'required|string',
-            'phone'         => 'required|string|max:20',
-            'email'         => 'required|email',
-            'illness'       => 'nullable|string',
-            'gender'        => 'required|in:Male,Female',
-            'shirt_size'    => 'required|in:M,L,XL',
-            'payment_method'=> 'required|in:qris,transfer',
-            'ticket_type'   => 'required|string',
-            'ticket_price'  => 'required|integer',
-        ]);
-=======
         try {
             $validated = $request->validate([
                 'name' => 'required|string|max:255',
@@ -54,36 +39,17 @@ class EventRegistrationController extends Controller
                 'payment_proof' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:5120', // 5MB
                 'agreement' => 'required|accepted',
             ]);
->>>>>>> dd0cf2d59a7d21d887e90d5a7e9c27f20c955594
 
             // Handle payment proof upload
             $paymentProofPath = null;
             $paymentProofFilename = null;
 
-<<<<<<< HEAD
-        $registration = DB::table('event_registrations')->insertGetId([
-            'name'              => $validated['name'],
-            'nik'               => $validated['nik'],
-            'address'           => $validated['address'],
-            'phone'             => $validated['phone'],
-            'email'             => $validated['email'],
-            'illness'           => $validated['illness'],
-            'gender'            => $validated['gender'],
-            'shirt_size'        => $validated['shirt_size'],
-            'payment_method'    => $validated['payment_method'],
-            'payment_status'    => 'pending',
-            'registration_code' => $registrationCode,
-            'created_at'        => now(),
-            'updated_at'        => now(),
-        ]);
-=======
             if ($request->hasFile('payment_proof')) {
                 $file = $request->file('payment_proof');
                 $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
                 $paymentProofPath = $file->storeAs('payment-proofs', $filename, 'public');
                 $paymentProofFilename = $file->getClientOriginalName();
             }
->>>>>>> dd0cf2d59a7d21d887e90d5a7e9c27f20c955594
 
             // Create registration
             $registration = EventRegistration::create([

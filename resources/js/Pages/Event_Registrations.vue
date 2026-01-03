@@ -3,14 +3,15 @@ import { ref, computed } from 'vue'
 import { useForm, Head, Link } from '@inertiajs/vue3'
 
 const form = useForm({
-    name: "",
-    nik: "",
-    address: "",
-    phone: "",
-    email: "",
-    illness: "",
-    shirt_size: "",
-    ticket_type: "",
+    name: '',
+    nik: '',
+    address: '',
+    phone: '',
+    email: '',
+    gender: '',
+    illness: '',
+    shirt_size: '',
+    ticket_type: '',
     ticket_price: 0,
     payment_method: 'QRIS',
     transaction_id: '',
@@ -82,10 +83,7 @@ const submit = () => {
 <template>
     <Head title="Form Pendaftaran Event" />
 
-    <div
-        class="min-h-screen bg-gradient-to-b from-[#EAF9FD] to-[#2DB7D2] py-10 px-4"
-    >
-
+    <div class="min-h-screen bg-gradient-to-b from-[#EAF9FD] to-[#2DB7D2] py-10 px-4">
         <div class="max-w-5xl mx-auto">
 
             <!-- LOGO -->
@@ -95,6 +93,16 @@ const submit = () => {
             <h2 class="section-title">Identitas Peserta</h2>
 
             <div class="card mb-12">
+                
+                <!-- ⚠️ PERHATIAN -->
+                <div class="bg-red-600 text-white rounded-lg p-4 text-sm mb-8">
+                    <p class="font-bold text-center mb-1">PERHATIAN!!!</p>
+                    <ol class="list-decimal list-inside">
+                        <li>Pastikan email yang diisikan benar</li>
+                        <li>Ruang penyimpanan email pastikan tidak penuh</li>
+                    </ol>
+                </div>
+
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <label class="label">Nama Lengkap <span class="text-red-600">*</span></label>
@@ -129,12 +137,10 @@ const submit = () => {
                         <label class="label">Riwayat Penyakit</label>
                         <input v-model="form.illness" class="input" placeholder="Kosongkan jika tidak ada" />
                     </div>
-                    <div class="md:col-span-2">
-                        <label class="label">Ukuran Jersey</label>
-                        <select v-model="form.shirt_size" class="input">
-                            <option disabled value="">
-                                Klik untuk Pilih Ukuran Jersey
-                            </option>
+                    <div>
+                        <label class="label">Ukuran Jersey <span class="text-red-600">*</span></label>
+                        <select v-model="form.shirt_size" class="input" required>
+                            <option disabled value="">Klik untuk Pilih Ukuran Jersey</option>
                             <option>M</option>
                             <option>L</option>
                             <option>XL</option>
@@ -146,11 +152,11 @@ const submit = () => {
             <!-- ================= HALAMAN PEMBAYARAN ================= -->
             <h2 class="section-title">Halaman Pembayaran</h2>
 
-            <div class="mb-12 card">
-                <h3 class="mb-6 text-lg font-bold text-center">Jenis Ticket</h3>
+            <div class="card mb-12">
+                <h3 class="text-center font-bold text-lg mb-6">Jenis Ticket</h3>
 
                 <!-- TIKET -->
-                <div class="flex flex-wrap justify-center gap-6 mb-8">
+                <div class="flex justify-center gap-6 flex-wrap mb-8">
                     <button
                         v-for="ticket in tickets"
                         :key="ticket.name"
@@ -171,27 +177,19 @@ const submit = () => {
                 </div>
 
                 <!-- SELESAIKAN PEMBAYARAN -->
-                <div class="mb-10 text-center btn-orange">
+                <div class="btn-orange mb-10 text-center">
                     Selesaikan Pembayaranmu
                 </div>
 
                 <!-- DETAIL TRANSAKSI -->
-                <div
-                    class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center mb-10"
-                >
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center mb-10">
                     <div class="text-sm space-y-2">
                         <p class="font-semibold mb-2">Detail Transaksi</p>
                         <p>Payment Method : QRIS</p>
-                        <p>Tanggal : 2 Juli 2025</p>
-                        <p>
-                            Harga Tiket : Rp{{
-                                form.ticket_price.toLocaleString("id-ID")
-                            }}
-                        </p>
+                        <p>Tanggal : {{ currentDate }}</p>
+                        <p>Harga Tiket : Rp{{ form.ticket_price.toLocaleString('id-ID') }}</p>
                         <div class="border-t pt-2 font-bold">
-                            Total Harga : Rp{{
-                                form.ticket_price.toLocaleString("id-ID")
-                            }}
+                            Total Harga : Rp{{ form.ticket_price.toLocaleString('id-ID') }}
                         </div>
                     </div>
 
@@ -200,27 +198,17 @@ const submit = () => {
                     </div>
                 </div>
 
-                <!-- ⚠️ PERHATIAN -->
-                <div class="bg-red-600 text-white rounded-lg p-4 text-sm mb-8">
-                    <p class="font-bold text-center mb-1">PERHATIAN!!!</p>
-                    <ol class="list-decimal list-inside">
-                        <li>Pastikan email yang diisikan benar</li>
-                        <li>Ruang penyimpanan email pastikan tidak penuh</li>
-                    </ol>
-                </div>
-
                 <!-- ================= KONFIRMASI PEMBAYARANMU ================= -->
-                <div class="mb-10 text-center btn-orange">
+                <div class="btn-orange mb-10 text-center">
                     Konfirmasi Pembayaranmu
                 </div>
 
-                <div class="mb-6 space-y-4">
+                <div class="space-y-4 mb-6">
                     <div>
                         <label class="label">ID Transaksional (Opsional)</label>
-                        <input v-model="form.transaction_id" class="input" />
+                        <input v-model="form.transaction_id" class="input" placeholder="Nomor referensi pembayaran (opsional)" />
                         <p class="text-xs text-gray-500 mt-1">
-                            Nomor referensi membantu verifikasi pembayaran lebih
-                            cepat
+                            Nomor referensi membantu verifikasi pembayaran lebih cepat
                         </p>
                     </div>
 
@@ -234,16 +222,14 @@ const submit = () => {
                             @change="e => form.payment_proof = e.target.files[0]"
                         />
                         <p class="text-xs text-gray-500 mt-1">
-                            • Format JPG, PNG, JPEG <br />
-                            • Maksimal ukuran: 5 Mb <br />
+                            • Format JPG, PNG, JPEG <br>
+                            • Maksimal ukuran: 5 Mb <br>
                             • Pastikan bukti pembayaran jelas dan dapat dibaca
                         </p>
                     </div>
 
-                    <label
-                        class="flex items-start gap-2 text-sm text-red-600 font-medium"
-                    >
-                        <input type="checkbox" v-model="form.agreement" />
+                    <label class="flex items-start gap-2 text-sm text-red-600 font-medium">
+                        <input type="checkbox" v-model="form.agreement" required class="mt-1" />
                         <span>
                             <span class="text-red-600">*</span> Saya menyetujui bahwa informasi yang saya berikan adalah benar dan
                             telah melakukan pembayaran sesuai jumlah yang tertera
@@ -258,6 +244,10 @@ const submit = () => {
                 >
                     Konfirmasi Pembayaran
                 </button>
+
+                <Link href="/" class="block mt-4 w-full py-3 rounded-xl font-semibold text-[#1FB5D5] bg-white border-2 border-[#1FB5D5] hover:bg-[#1FB5D5] hover:text-white transition-all duration-300 text-center">
+                    Kembali ke Halaman Utama
+                </Link>
             </div>
 
         </div>
@@ -303,13 +293,5 @@ const submit = () => {
 .btn-submit {
     @apply w-full py-3 rounded-xl font-semibold text-white
     bg-[#1FB5D5] hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed;
-}
-
-.btn-back {
-    @apply w-full py-3 rounded-xl font-semibold text-center
-    bg-orange-400 text-white
-    hover:bg-orange-600
-    transition
-    mt-4;
 }
 </style>
