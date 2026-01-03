@@ -34,7 +34,7 @@ const filteredUsers = computed(() => {
 </script>
 
 <template>
-  <div class="bg-white rounded-2xl shadow-sm px-8 py-6">
+  <div class="px-8 py-6 bg-white shadow-sm rounded-2xl">
 
     <!-- HEADER -->
     <div class="flex justify-end mb-6">
@@ -43,25 +43,20 @@ const filteredUsers = computed(() => {
         <!-- SEARCH (DEKAT BUTTON) -->
         <div class="relative w-72">
           <MagnifyingGlassIcon
-            class="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+            class="absolute w-5 h-5 text-gray-400 -translate-y-1/2 left-3 top-1/2"
           />
           <input
             v-model="search"
             type="text"
             placeholder="Cari username atau email..."
-            class="w-full pl-10 pr-4 py-2 text-sm
-                  border border-gray-300 rounded-lg
-                  focus:ring-2 focus:ring-blue-500
-                  focus:border-blue-500 outline-none"
+            class="w-full py-2 pl-10 pr-4 text-sm border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           />
         </div>
 
         <!-- BUTTON -->
         <button
           @click="emit('create')"
-          class="flex items-center gap-2 px-4 py-2
-                 bg-blue-600 hover:bg-blue-700
-                 text-white rounded-lg transition"
+          class="flex items-center gap-2 px-4 py-2 text-white transition bg-blue-600 rounded-lg hover:bg-blue-700"
         >
           <PlusIcon class="w-5 h-5" />
           Tambahkan Pengguna
@@ -74,11 +69,11 @@ const filteredUsers = computed(() => {
     <div class="overflow-x-auto">
       <table class="w-full border-collapse min-h-[150px]">
         <thead>
-          <tr class="border-b text-sm text-gray-500">
-            <th class="py-4 text-left font-medium">Username</th>
-            <th class="text-left font-medium">Email</th>
-            <th class="text-left font-medium">Role</th>
-            <th class="text-center font-medium">Aksi</th>
+          <tr class="text-sm text-gray-500 border-b">
+            <th class="py-4 font-medium text-left">Username</th>
+            <th class="font-medium text-left">Email</th>
+            <th class="font-medium text-left">Role</th>
+            <th class="font-medium text-center">Aksi</th>
           </tr>
         </thead>
 
@@ -86,7 +81,7 @@ const filteredUsers = computed(() => {
           <tr
             v-for="user in filteredUsers"
             :key="user.id"
-            class="border-b last:border-none hover:bg-gray-50 transition"
+            class="transition border-b last:border-none hover:bg-gray-50"
           >
             <td class="py-5 font-medium text-gray-800">
               {{ user.name }}
@@ -99,16 +94,14 @@ const filteredUsers = computed(() => {
             <td>
               <span
                 v-if="user.role === 'admin'"
-                class="inline-block px-4 py-1 text-sm
-                       text-red-600 bg-red-100 rounded-lg"
+                class="inline-block px-4 py-1 text-sm text-red-600 bg-red-100 rounded-lg"
               >
                 Admin
               </span>
 
               <span
                 v-else
-                class="inline-block px-4 py-1 text-sm
-                       text-blue-600 bg-blue-100 rounded-lg"
+                class="inline-block px-4 py-1 text-sm text-blue-600 bg-blue-100 rounded-lg"
               >
                 User
               </span>
@@ -118,7 +111,7 @@ const filteredUsers = computed(() => {
               <div class="flex justify-center gap-4">
                 <button
                   @click="emit('edit', user)"
-                  class="text-gray-500 hover:text-blue-600 transition"
+                  class="text-gray-500 transition hover:text-blue-600"
                   title="Edit user"
                 >
                   <PencilSquareIcon class="w-5 h-5" />
@@ -126,7 +119,7 @@ const filteredUsers = computed(() => {
 
                 <button
                   @click="emit('delete', user)"
-                  class="text-gray-500 hover:text-red-600 transition"
+                  class="text-gray-500 transition hover:text-red-600"
                   title="Hapus user"
                 >
                   <TrashIcon class="w-5 h-5" />

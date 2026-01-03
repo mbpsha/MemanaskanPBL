@@ -7,6 +7,7 @@ use App\Models\EventRegistration;
 use App\Mail\PaymentApprovedMail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class RegistrationManagementController extends Controller
@@ -110,7 +111,7 @@ class RegistrationManagementController extends Controller
         $registration->update([
             'payment_status' => 'verified',
             'payment_verified_at' => now(),
-            'verified_by' => auth()->id(),
+            'verified_by' => Auth::id(),
             'rejection_reason' => null,
         ]);
 
@@ -163,7 +164,7 @@ class RegistrationManagementController extends Controller
         $registration->update([
             'payment_status' => 'rejected',
             'payment_verified_at' => now(),
-            'verified_by' => auth()->id(),
+            'verified_by' => Auth::id(),
             'rejection_reason' => $validated['rejection_reason'],
         ]);
 

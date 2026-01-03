@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\RegistrationManagementController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\PaymentVerificationController;
 use App\Http\Controllers\Admin\RacepackController;
+use App\Http\Controllers\Admin\ScannerController;
 use App\Http\Controllers\EventRegistrationController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
@@ -62,6 +63,10 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
 
     // Racepack Collection
     Route::post('/racepack/scan', [RacepackController::class, 'updateStatus'])->name('racepack.scan');
+
+    // Barcode Scanner
+    Route::get('/scan', [ScannerController::class, 'index'])->name('scan.index');
+    Route::post('/scan/verify', [ScannerController::class, 'verify'])->name('scan.verify');
 });
 
 Route::middleware('auth')->group(function () {

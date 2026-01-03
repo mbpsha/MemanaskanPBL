@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\EventRegistration;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Auth;
 
 class RacepackController extends Controller
 {
@@ -41,10 +42,10 @@ class RacepackController extends Controller
         // Eksekusi: Jika payment_status adalah 'verified', ubah menjadi 'done'
         if ($registration->payment_status === 'verified') {
             $registration->payment_status = 'done';
-            
+
             // Audit trail: Update verified_by dengan user yang melakukan scan
-            $registration->verified_by = auth()->id();
-            
+            $registration->verified_by = Auth::id();
+
             $registration->save();
 
             // Success data untuk ditampilkan
