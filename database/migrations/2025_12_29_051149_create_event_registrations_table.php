@@ -15,7 +15,7 @@ return new class extends Migration {
             $table->string('phone');
             $table->string('email');
             $table->text('illness')->nullable(); // Medical conditions
-            $table->enum('shirt_size', ['M', 'L', 'XL']);
+            $table->enum('shirt_size', ['S', 'M', 'L', 'XL']);
             $table->string('payment_method')->nullable();
 
             // Payment proof
@@ -23,7 +23,7 @@ return new class extends Migration {
             $table->string('payment_proof_filename')->nullable();
 
             // Status tracking
-            $table->enum('payment_status', ['pending', 'uploaded', 'verified', 'rejected'])->default('pending');
+            $table->enum('payment_status', ['pending', 'uploaded', 'verified', 'rejected', 'done'])->default('pending');
             $table->timestamp('payment_verified_at')->nullable();
             $table->foreignId('verified_by')->nullable()->constrained('users');
             $table->text('rejection_reason')->nullable();

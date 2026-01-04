@@ -150,10 +150,10 @@ onUnmounted(() => {
         <div class="max-w-4xl mx-auto">
             <div class="mb-8">
                 <h1 class="text-3xl font-bold text-gray-800">
-                    Scan Barcode Peserta
+                    Scan QR Code Peserta
                 </h1>
                 <p class="mt-2 text-gray-600">
-                    Scan barcode dari email konfirmasi peserta untuk verifikasi
+                    Scan QR code dari email konfirmasi peserta untuk verifikasi
                     pengambilan racepack
                 </p>
             </div>
@@ -178,10 +178,23 @@ onUnmounted(() => {
                             v-if="scanning && !scanResult"
                             class="absolute inset-0 flex items-center justify-center pointer-events-none"
                         >
-                            <div
-                                class="border-4 border-green-500 rounded-lg animate-pulse"
-                                style="width: 80%; height: 40%"
-                            ></div>
+                            <!-- Dark overlay outside scan area -->
+                            <div class="absolute inset-0 bg-black bg-opacity-60"></div>
+                            
+                            <!-- Scan frame container -->
+                            <div class="relative" style="width: 70%; aspect-ratio: 1/1;">
+                                <!-- Transparent center (cut-out effect) -->
+                                <div class="absolute inset-0 border-4 border-green-500 rounded-lg bg-transparent" style="box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.6);"></div>
+                                
+                                <!-- Corner markers -->
+                                <div class="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-green-400"></div>
+                                <div class="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-green-400"></div>
+                                <div class="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-green-400"></div>
+                                <div class="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-green-400"></div>
+                                
+                                <!-- Scanning animation line -->
+                                <div class="absolute inset-x-0 top-0 h-1 bg-green-400 animate-scan"></div>
+                            </div>
                         </div>
 
                         <!-- Loading Indicator -->
@@ -384,5 +397,21 @@ onUnmounted(() => {
 <style scoped>
 video {
     transform: scaleX(-1); /* Mirror the video for better UX */
+}
+
+@keyframes scan {
+    0% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(calc(100% * 20));
+    }
+    100% {
+        transform: translateY(0);
+    }
+}
+
+.animate-scan {
+    animation: scan 2s ease-in-out infinite;
 }
 </style>

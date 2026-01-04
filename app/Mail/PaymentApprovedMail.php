@@ -8,14 +8,15 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
-use Picqer\Barcode\BarcodeGeneratorPNG;
+use Endroid\QrCode\QrCode;
+use Endroid\QrCode\Writer\PngWriter;
 
 class PaymentApprovedMail extends Mailable
 {
     use Queueable, SerializesModels;
 
     public $registration;
-    public $barcodeImage;
+    public $qrcodeImage;
 
     /**
      * Create a new message instance.
@@ -24,34 +25,17 @@ class PaymentApprovedMail extends Mailable
     {
         $this->registration = $registration;
 
-        // Generate barcode image (Code 128 format)
+        // Generate QR code image
         try {
-            // Try local generation first if GD is available
-            if (extension_loaded('gd') && function_exists('imagecreate')) {
-                $generator = new BarcodeGeneratorPNG();
-                $this->barcodeImage = base64_encode(
-                    $generator->getBarcode($registration->registration_code, $generator::TYPE_CODE_128)
-                );
-            } else {
-                // Fallback: Use external barcode API
-                \Log::info('Using external barcode API as fallback');
-                $barcodeUrl = 'https://barcode.tec-it.com/barcode.ashx?data=' . urlencode($registration->registration_code) . '&code=Code128&translate-esc=on&dpi=96&imagetype=png';
-
-                // Fetch barcode from external API
-                $barcodeData = @file_get_contents($barcodeUrl);
-
-                if ($barcodeData !== false) {
-                    $this->barcodeImage = base64_encode($barcodeData);
-                    \Log::info('Barcode generated successfully using external API');
-                } else {
-                    throw new \Exception('Failed to fetch barcode from external API');
-                }
-            }
+            $qrCode = new QrCode($registration->registration_code);
+            $writer = new PngWriter();
+            $result = $writer->write($qrCode);
+            
+            $this->qrcodeImage = base64_encode($result->getString());
+            \Log::info('QR code generated successfully for: ' . $registration->registration_code);
         } catch (\Exception $e) {
-            \Log::error('Failed to generate barcode: ' . $e->getMessage());
-            \Log::error('GD loaded: ' . (extension_loaded('gd') ? 'yes' : 'no'));
-            \Log::error('GD functions: ' . (function_exists('imagecreate') ? 'yes' : 'no'));
-            $this->barcodeImage = null;
+            \Log::error('Failed to generate QR code: ' . $e->getMessage());
+            $this->qrcodeImage = null;
         }
     }
 
@@ -78,7 +62,7 @@ class PaymentApprovedMail extends Mailable
                 'bibNumber' => $this->registration->bib_number,
                 'shirtSize' => $this->registration->shirt_size,
                 'verifiedAt' => $this->registration->payment_verified_at->format('d F Y, H:i'),
-                'barcodeImage' => $this->barcodeImage,
+                'qrcodeImage' => $this->qrcodeImage,
             ],
         );
     }

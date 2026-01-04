@@ -35,11 +35,18 @@ class ScannerController extends Controller
             ], 404);
         }
 
+        // Check if payment is verified
         $isVerified = $registration->payment_status === 'verified';
+
+        // Update payment status to "done" when scanned (only if currently verified)
+        if ($registration->payment_status === 'verified') {
+            $registration->payment_status = 'done';
+            $registration->save();
+        }
 
         return response()->json([
             'ok' => true,
-            'verified' => $isVerified,
+            'verified' => $isVerified || $registration->payment_status === 'done', // Allow already collected participants
             'participant' => [
                 'name' => $registration->name,
                 'nik' => $registration->nik,

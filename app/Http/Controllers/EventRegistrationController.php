@@ -32,7 +32,7 @@ class EventRegistrationController extends Controller
                 'email' => 'required|email|max:255',
                 'gender' => 'required|in:M,F',
                 'illness' => 'nullable|string',
-                'shirt_size' => 'required|in:M,L,XL',
+                'shirt_size' => 'required|in:S,M,L,XL',
                 'ticket_type' => 'required|string',
                 'ticket_price' => 'required|integer',
                 'transaction_id' => 'nullable|string',

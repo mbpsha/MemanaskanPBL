@@ -174,23 +174,12 @@
             <strong>WebRunning 5K Event</strong>!
         </p>
 
-        <!-- BIB Number -->
-        <div class="bib-number">
-            {{ $bibNumber }}
-        </div>
-        <p style="text-align: center; color: #666; margin-top: -10px; font-size: 18px;">Your BIB Number</p>
-
         <!-- Registration Details -->
         <div class="info-box">
             <h3>Registration Details</h3>
             <div class="info-row">
                 <span class="label">Registration Code:</span>
                 <span class="value">{{ $registrationCode }}</span>
-                <div style="clear: both;"></div>
-            </div>
-            <div class="info-row">
-                <span class="label">BIB Number:</span>
-                <span class="value"><strong>{{ $bibNumber }}</strong></span>
                 <div style="clear: both;"></div>
             </div>
             <div class="info-row">
@@ -205,15 +194,15 @@
             </div>
         </div>
 
-        <!-- Ticket-style Barcode -->
-        @if($barcodeImage)
+        <!-- Ticket-style QR Code -->
+        @if($qrcodeImage)
             <div class="ticket-container">
                 <div class="ticket-header">
                     <p class="ticket-title">WEBRUNNING 5K EVENT 2026</p>
                 </div>
 
                 <div class="barcode-wrapper">
-                    <img src="data:image/png;base64,{{ $barcodeImage }}" alt="Barcode">
+                    <img src="data:image/png;base64,{{ $qrcodeImage }}" alt="QR Code">
                 </div>
 
                 <div class="ticket-id">
@@ -222,7 +211,7 @@
 
                 <div class="ticket-details">
                     <p><strong>• Name:</strong> {{ $name }}</p>
-                    <p><strong>• BIB Number:</strong> {{ $bibNumber }}</p>
+                    <p><strong>• Registration Code:</strong> {{ $registrationCode }}</p>
                     <p><strong>• Size Jersey:</strong> {{ $shirtSize }}</p>
                 </div>
 
@@ -233,7 +222,7 @@
             </div>
         @else
             <div style="background: #ffebee; padding: 15px; border-radius: 8px; text-align: center; color: #c62828;">
-                <p><strong>⚠️ Barcode generation failed</strong></p>
+                <p><strong>⚠️ QR code generation failed</strong></p>
                 <p>Please contact support with your registration code: <strong>{{ $registrationCode }}</strong></p>
             </div>
         @endif
@@ -244,8 +233,7 @@
             <ul style="margin: 10px 0; padding-left: 20px;">
                 <li><strong>Save this email</strong> - You'll need it for race pack pickup</li>
                 <li><strong>Bring your ID</strong> - Bring your ID card (NIK) when collecting race pack</li>
-                <li><strong>Show the barcode</strong> - Present the barcode above at the pickup counter</li>
-                <li><strong>Your BIB number is {{ $bibNumber }}</strong> - Remember this number!</li>
+                <li><strong>Show the QR code</strong> - Present the QR code above at the pickup counter</li>
             </ul>
         </div>
 
@@ -254,7 +242,7 @@
         <ul>
             <li>Wait for race pack pickup schedule announcement</li>
             <li>Bring this email (printed or on your phone)</li>
-            <li>Collect your race pack with BIB number <strong>{{ $bibNumber }}</strong></li>
+            <li>Show your QR code to collect race pack</li>
             <li>Prepare for the event day!</li>
         </ul>
 
