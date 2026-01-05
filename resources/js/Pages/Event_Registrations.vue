@@ -13,7 +13,7 @@ const form = useForm({
     shirt_size: '',
     ticket_type: '',
     ticket_price: 0,
-    payment_method: 'QRIS',
+    payment_method: 'Transfer Bank',
     transaction_id: '',
     payment_proof: null,
     agreement: false,
@@ -186,7 +186,7 @@ const submit = () => {
                 <div class="grid items-center grid-cols-1 gap-8 mb-10 md:grid-cols-2">
                     <div class="space-y-2 text-sm">
                         <p class="mb-2 font-semibold">Detail Transaksi</p>
-                        <p>Payment Method : QRIS</p>
+                        <p>Payment Method : Transfer Bank</p>
                         <p>Tanggal : {{ currentDate }}</p>
                         <p>Harga Tiket : Rp{{ form.ticket_price.toLocaleString('id-ID') }}</p>
                         <div class="pt-2 font-bold border-t">
@@ -194,12 +194,24 @@ const submit = () => {
                         </div>
                     </div>
 
-                    <div class="flex justify-center">
-                        <img src="/images/event run1.png" class="w-48" />
+                    <div class="space-y-2 text-sm">
+                        <p class="mb-2 font-semibold">Informasi Rekening</p>
+                        <div class="p-4 bg-gray-50 rounded-lg">
+                            <p class="font-medium">Nama Penerima:</p>
+                            <p class="mb-3 text-lg font-bold text-[#1FB5D5]"> a.n Lisak Yiha Rodliyah </p>
+                            
+                            <p class="font-medium">Bank:</p>
+                            <p class="mb-3 text-lg font-bold text-[#1FB5D5]"> 🏦 BRI </p>
+                            
+                            <p class="font-medium">Nomor Rekening:</p>
+                            <p class="text-xl font-bold text-[#1FB5D5]"> 7672 01 005378 53 1 </p>
+                        </div>
+                        <p class="text-xs text-gray-500 italic">
+                            * Mohon transfer sesuai dengan total harga yang tertera agar proses verifikasi berjalan lancar
+                        </p>
                     </div>
                 </div>
 
-                <!-- ================= KONFIRMASI PEMBAYARANMU ================= -->
                 <div class="mb-10 text-center btn-orange">
                     Konfirmasi Pembayaranmu
                 </div>
