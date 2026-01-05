@@ -24,8 +24,8 @@ class PaymentApprovedMail extends Mailable
         $this->registration = $registration;
 
         // Generate QR code URL using external API
-        // QR code contains public verification URL (no auth required)
-        $verifyUrl = config('app.url') . '/verify/' . $registration->registration_code;
+        // QR code redirects to admin scan page with code parameter
+        $verifyUrl = config('app.url') . '/admin/scan?code=' . $registration->registration_code;
         $qrData = urlencode($verifyUrl);
         $this->qrcodeImage = "https://quickchart.io/qr?text={$qrData}&size=300";
 

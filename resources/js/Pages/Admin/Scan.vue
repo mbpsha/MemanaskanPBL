@@ -76,16 +76,28 @@ const verifyCode = async (code) => {
     loading.value = true;
     error.value = "";
 
+    // Extract registration code if scanned code is a URL
+    let registrationCode = code;
     try {
-        const response = await fetch(route("admin.scan.verify"), {
-            method: "POST",
+        // Check if code is a URL
+        if (code.startsWith('http://') || code.startsWith('https://')) {
+            const url = new URL(code);
+            const codeParam = url.searchParams.get('code');
+            if (codeParam) {
+                registrationCode = codeParam;
+            }
+        }
+    } catch (e) {
+        // If URL parsing fails, use original code
+        registrationCode = code;
+    }
+
+    try {
+        const response = await fetch(route("admin.scan.verify") + "?code=" + encodeURIComponent(registrationCode), {
+            method: "GET",
             headers: {
                 "Content-Type": "application/json",
-                "X-CSRF-TOKEN": document.querySelector(
-                    'meta[name="csrf-token"]'
-                ).content,
             },
-            body: JSON.stringify({ code }),
         });
 
         const data = await response.json();
@@ -136,8 +148,18 @@ const manualVerify = async () => {
 };
 
 onMounted(() => {
-    // Auto start scanning on mount
-    startScanning();
+    // Check if there's a code in URL query parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    const codeFromUrl = urlParams.get('code');
+
+    if (codeFromUrl) {
+        // If code is in URL, verify it directly without starting camera
+        scannedCode.value = codeFromUrl;
+        verifyCode(codeFromUrl);
+    } else {
+        // Auto start scanning on mount if no code in URL
+        startScanning();
+    }
 });
 
 onUnmounted(() => {

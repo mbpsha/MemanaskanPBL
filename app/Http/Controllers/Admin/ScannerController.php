@@ -66,11 +66,16 @@ class ScannerController extends Controller
      */
     public function verify(Request $request)
     {
-        $validated = $request->validate([
-            'code' => 'required|string|max:255',
-        ]);
+        $code = $request->query('code');
 
-        $registration = EventRegistration::where('registration_code', $validated['code'])->first();
+        if (!$code) {
+            return response()->json([
+                'ok' => false,
+                'message' => 'Kode registrasi tidak ditemukan.',
+            ], 400);
+        }
+
+        $registration = EventRegistration::where('registration_code', $code)->first();
 
         if (!$registration) {
             return response()->json([

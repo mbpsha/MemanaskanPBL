@@ -39,7 +39,7 @@ Route::prefix('api')->group(function () {
 });
 
 // Public QR Code Verification (no authentication required)
-Route::get('/verify/{code}', [ScannerController::class, 'publicVerify'])->name('verify.public');
+Route::get('/admin/scan/verify', [ScannerController::class, 'verify'])->name('admin.scan.verify');
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     // User Management
@@ -67,9 +67,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     // Racepack Collection
     Route::post('/racepack/scan', [RacepackController::class, 'updateStatus'])->name('racepack.scan');
 
-    // Barcode Scanner
+    // Barcode Scanner (admin page only, verify endpoint is public)
     Route::get('/scan', [ScannerController::class, 'index'])->name('scan.index');
-    Route::post('/scan/verify', [ScannerController::class, 'verify'])->name('scan.verify');
 });
 
 Route::middleware('auth')->group(function () {
