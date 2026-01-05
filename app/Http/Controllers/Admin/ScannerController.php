@@ -18,7 +18,51 @@ class ScannerController extends Controller
     }
 
     /**
-     * Verify scanned registration code
+     * Public verification endpoint for QR code scanning (no auth required)
+     */
+    public function publicVerify($code)
+    {
+        $registration = EventRegistration::where('registration_code', $code)->first();
+
+        if (!$registration) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Kode registrasi tidak ditemukan.',
+            ], 404);
+        }
+
+        // Check if payment is verified
+        $isVerified = $registration->payment_status === 'verified' || $registration->payment_status === 'done';
+
+        if (!$isVerified) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Pembayaran belum diverifikasi.',
+                'payment_status' => $registration->payment_status,
+            ], 403);
+        }
+
+        // Update payment status to "done" when scanned (only if currently verified)
+        if ($registration->payment_status === 'verified') {
+            $registration->payment_status = 'done';
+            $registration->save();
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Tiket berhasil diverifikasi!',
+            'participant' => [
+                'name' => $registration->name,
+                'bib_number' => $registration->bib_number,
+                'shirt_size' => $registration->shirt_size,
+                'registration_code' => $registration->registration_code,
+                'payment_status' => $registration->payment_status,
+            ],
+        ]);
+    }
+
+    /**
+     * Verify scanned registration code (for admin panel)
      */
     public function verify(Request $request)
     {

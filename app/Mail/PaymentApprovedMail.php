@@ -8,8 +8,6 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
-use Endroid\QrCode\QrCode;
-use Endroid\QrCode\Writer\PngWriter;
 
 class PaymentApprovedMail extends Mailable
 {
@@ -25,18 +23,13 @@ class PaymentApprovedMail extends Mailable
     {
         $this->registration = $registration;
 
-        // Generate QR code image
-        try {
-            $qrCode = new QrCode($registration->registration_code);
-            $writer = new PngWriter();
-            $result = $writer->write($qrCode);
-            
-            $this->qrcodeImage = base64_encode($result->getString());
-            \Log::info('QR code generated successfully for: ' . $registration->registration_code);
-        } catch (\Exception $e) {
-            \Log::error('Failed to generate QR code: ' . $e->getMessage());
-            $this->qrcodeImage = null;
-        }
+        // Generate QR code URL using external API
+        // QR code contains public verification URL (no auth required)
+        $verifyUrl = config('app.url') . '/verify/' . $registration->registration_code;
+        $qrData = urlencode($verifyUrl);
+        $this->qrcodeImage = "https://quickchart.io/qr?text={$qrData}&size=300";
+
+        \Log::info('QR code URL generated for: ' . $registration->registration_code);
     }
 
     /**

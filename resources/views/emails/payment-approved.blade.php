@@ -202,7 +202,7 @@
                 </div>
 
                 <div class="barcode-wrapper">
-                    <img src="data:image/png;base64,{{ $qrcodeImage }}" alt="QR Code">
+                    <img src="{{ $qrcodeImage }}" alt="QR Code" style="max-width: 250px; height: auto;">
                 </div>
 
                 <div class="ticket-id">

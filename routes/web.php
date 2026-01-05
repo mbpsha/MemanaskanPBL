@@ -38,6 +38,9 @@ Route::prefix('api')->group(function () {
     Route::get('/registrations', [RegistrationController::class, 'index']);
 });
 
+// Public QR Code Verification (no authentication required)
+Route::get('/verify/{code}', [ScannerController::class, 'publicVerify'])->name('verify.public');
+
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     // User Management
     Route::get('/users', [UserController::class, 'index'])->name('users.index');
