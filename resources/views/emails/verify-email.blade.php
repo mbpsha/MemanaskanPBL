@@ -13,7 +13,7 @@
                     <!-- Logo -->
                     <tr>
                         <td align="center">
-                            <img src="{{ asset('images/event run1.png') }}"
+                            <img src="{{ config('app.url') }}/images/event%20run1.png"
                                  alt="Ramadan Vaganza 2026"
                                  style="height:180px;margin-bottom:20px">
                         </td>

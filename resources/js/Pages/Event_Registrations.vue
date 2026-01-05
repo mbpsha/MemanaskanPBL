@@ -13,7 +13,7 @@ const form = useForm({
     shirt_size: '',
     ticket_type: '',
     ticket_price: 0,
-    payment_method: 'QRIS',
+    payment_method: 'Transfer Bank',
     transaction_id: '',
     payment_proof: null,
     agreement: false,
@@ -92,18 +92,18 @@ const submit = () => {
             <!-- ================= IDENTITAS PESERTA ================= -->
             <h2 class="section-title">Identitas Peserta</h2>
 
-            <div class="card mb-12">
-                
+            <div class="mb-12 card">
+
                 <!-- ⚠️ PERHATIAN -->
-                <div class="bg-red-600 text-white rounded-lg p-4 text-sm mb-8">
-                    <p class="font-bold text-center mb-1">PERHATIAN!!!</p>
+                <div class="p-4 mb-8 text-sm text-white bg-red-600 rounded-lg">
+                    <p class="mb-1 font-bold text-center">PERHATIAN!!!</p>
                     <ol class="list-decimal list-inside">
                         <li>Pastikan email yang diisikan benar</li>
                         <li>Ruang penyimpanan email pastikan tidak penuh</li>
                     </ol>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
                     <div>
                         <label class="label">Nama Lengkap <span class="text-red-600">*</span></label>
                         <input v-model="form.name" class="input" required />
@@ -129,18 +129,19 @@ const submit = () => {
                         <label class="label">Gender <span class="text-red-600">*</span></label>
                         <select v-model="form.gender" class="input" required>
                             <option disabled value="">Pilih Gender</option>
-                            <option value="Male">Laki-Laki</option>
-                            <option value="Female">Perempuan</option>
+                            <option value="M">Laki-Laki</option>
+                            <option value="F">Perempuan</option>
                         </select>
                     </div>
                     <div>
                         <label class="label">Riwayat Penyakit</label>
                         <input v-model="form.illness" class="input" placeholder="Kosongkan jika tidak ada" />
                     </div>
-                    <div class="md:col-span-2">
+                    <div>
                         <label class="label">Ukuran Jersey <span class="text-red-600">*</span></label>
                         <select v-model="form.shirt_size" class="input" required>
                             <option disabled value="">Klik untuk Pilih Ukuran Jersey</option>
+                            <option>S</option>
                             <option>M</option>
                             <option>L</option>
                             <option>XL</option>
@@ -152,11 +153,11 @@ const submit = () => {
             <!-- ================= HALAMAN PEMBAYARAN ================= -->
             <h2 class="section-title">Halaman Pembayaran</h2>
 
-            <div class="card mb-12">
-                <h3 class="text-center font-bold text-lg mb-6">Jenis Ticket</h3>
+            <div class="mb-12 card">
+                <h3 class="mb-6 text-lg font-bold text-center">Jenis Ticket</h3>
 
                 <!-- TIKET -->
-                <div class="flex justify-center gap-6 flex-wrap mb-8">
+                <div class="flex flex-wrap justify-center gap-6 mb-8">
                     <button
                         v-for="ticket in tickets"
                         :key="ticket.name"
@@ -177,37 +178,56 @@ const submit = () => {
                 </div>
 
                 <!-- SELESAIKAN PEMBAYARAN -->
-                <div class="btn-orange mb-10 text-center">
+                <div class="mb-10 text-center btn-orange">
                     Selesaikan Pembayaranmu
                 </div>
 
                 <!-- DETAIL TRANSAKSI -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center mb-10">
-                    <div class="text-sm space-y-2">
-                        <p class="font-semibold mb-2">Detail Transaksi</p>
-                        <p>Payment Method : QRIS</p>
+                <div class="grid items-center grid-cols-1 gap-8 mb-10 md:grid-cols-2">
+                    <div class="space-y-2 text-sm">
+                        <p class="mb-2 font-semibold">Detail Transaksi</p>
+                        <p>Payment Method : Transfer Bank</p>
                         <p>Tanggal : {{ currentDate }}</p>
                         <p>Harga Tiket : Rp{{ form.ticket_price.toLocaleString('id-ID') }}</p>
-                        <div class="border-t pt-2 font-bold">
+                        <div class="pt-2 font-bold border-t">
                             Total Harga : Rp{{ form.ticket_price.toLocaleString('id-ID') }}
                         </div>
                     </div>
 
-                    <div class="flex justify-center">
-                        <img src="/images/qris.png" class="w-48" />
+                    <div class="space-y-2 text-sm">
+                        <p class="mb-2 font-semibold">Informasi Rekening</p>
+                        <div class="p-4 bg-gray-50 rounded-lg">
+                            <p class="font-medium">Nama Penerima:</p>
+                            <p class="mb-3 text-lg font-bold text-[#1FB5D5]"> a.n Lisak Yiha Rodliyah </p>
+<<<<<<< HEAD
+
+                            <p class="font-medium">Bank:</p>
+                            <p class="mb-3 text-lg font-bold text-[#1FB5D5]"> 🏦 BRI </p>
+
+=======
+                            
+                            <p class="font-medium">Bank:</p>
+                            <p class="mb-3 text-lg font-bold text-[#1FB5D5]"> 🏦 BRI </p>
+                            
+>>>>>>> dbb1b47ddd24da4dcf572c1818bfda39723efcda
+                            <p class="font-medium">Nomor Rekening:</p>
+                            <p class="text-xl font-bold text-[#1FB5D5]"> 7672 01 005378 53 1 </p>
+                        </div>
+                        <p class="text-xs text-gray-500 italic">
+                            * Mohon transfer sesuai dengan total harga yang tertera agar proses verifikasi berjalan lancar
+                        </p>
                     </div>
                 </div>
 
-                <!-- ================= KONFIRMASI PEMBAYARANMU ================= -->
-                <div class="btn-orange mb-10 text-center">
+                <div class="mb-10 text-center btn-orange">
                     Konfirmasi Pembayaranmu
                 </div>
 
-                <div class="space-y-4 mb-6">
+                <div class="mb-6 space-y-4">
                     <div>
                         <label class="label">ID Transaksional (Opsional)</label>
                         <input v-model="form.transaction_id" class="input" placeholder="Nomor referensi pembayaran (opsional)" />
-                        <p class="text-xs text-gray-500 mt-1">
+                        <p class="mt-1 text-xs text-gray-500">
                             Nomor referensi membantu verifikasi pembayaran lebih cepat
                         </p>
                     </div>
@@ -221,14 +241,14 @@ const submit = () => {
                             required
                             @change="e => form.payment_proof = e.target.files[0]"
                         />
-                        <p class="text-xs text-gray-500 mt-1">
+                        <p class="mt-1 text-xs text-gray-500">
                             • Format JPG, PNG, JPEG <br>
                             • Maksimal ukuran: 5 Mb <br>
                             • Pastikan bukti pembayaran jelas dan dapat dibaca
                         </p>
                     </div>
 
-                    <label class="flex items-start gap-2 text-sm text-red-600 font-medium">
+                    <label class="flex items-start gap-2 text-sm font-medium text-red-600">
                         <input type="checkbox" v-model="form.agreement" required class="mt-1" />
                         <span>
                             <span class="text-red-600">*</span> Saya menyetujui bahwa informasi yang saya berikan adalah benar dan

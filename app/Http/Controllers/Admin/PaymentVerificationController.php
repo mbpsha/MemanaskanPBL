@@ -60,17 +60,60 @@ class PaymentVerificationController extends Controller
         ]);
 
         $statusMap = [
-            'uploaded' => 'pending',
+            'uploaded' => 'uploaded',
             'verified' => 'verified',
             'rejected' => 'rejected'
         ];
 
+
+        $newStatus = $statusMap[$validated['status']];
+
+        // Store old status before updating
+        $oldStatus = $payment->payment_status;
+
+        // Update payment status first
         $payment->update([
-            'payment_status' => $statusMap[$validated['status']],
+            'payment_status' => $newStatus,
             'verified_by' => Auth::id(),
             'payment_verified_at' => now(),
             'rejection_reason' => $validated['rejection_reason'] ?? null
         ]);
+
+        // If verifying payment for the FIRST time, generate BIB number and send email
+        if ($newStatus === 'verified' && $oldStatus !== 'verified') {
+            // Generate BIB number if not exists
+            if (!$payment->bib_number) {
+                $gender = $payment->gender ?? 'M'; // Default to M if not set
+                $baseNumber = 5000;
+
+                // Get the last BIB number for this gender
+                $lastBib = EventRegistration::where('gender', $gender)
+                    ->whereNotNull('bib_number')
+                    ->orderBy('bib_number', 'desc')
+                    ->first();
+
+                if ($lastBib && preg_match('/^[MF](\d+)$/', $lastBib->bib_number, $matches)) {
+                    $lastNumber = (int) $matches[1];
+                    $nextNumber = $lastNumber + 1;
+                } else {
+                    $nextNumber = $baseNumber + 1;
+                }
+
+                $payment->bib_number = $gender . $nextNumber;
+                $payment->save(); // Save BIB number
+            }
+
+            // Refresh model to get updated data
+            $payment->refresh();
+
+            // Send approval email
+            try {
+                \Mail::to($payment->email)->send(new \App\Mail\PaymentApprovedMail($payment));
+                \Log::info('Payment approval email sent to: ' . $payment->email);
+            } catch (\Exception $e) {
+                \Log::error('Failed to send payment approval email: ' . $e->getMessage());
+            }
+        }
 
         return redirect()->back()->with('success', 'Status pembayaran berhasil diupdate');
     }
@@ -82,7 +125,7 @@ class PaymentVerificationController extends Controller
         }
 
         $path = storage_path('app/public/' . $payment->payment_proof_path);
-        
+
         if (!file_exists($path)) {
             abort(404, 'File tidak ditemukan');
         }

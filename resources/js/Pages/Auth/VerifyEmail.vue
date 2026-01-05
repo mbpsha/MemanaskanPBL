@@ -1,21 +1,21 @@
 <script setup>
-import { computed } from 'vue'
-import GuestLayout from '@/Layouts/GuestLayout.vue'
-import { Head, Link, useForm } from '@inertiajs/vue3'
+import { computed } from "vue";
+import GuestLayout from "@/Layouts/GuestLayout.vue";
+import { Head, Link, useForm } from "@inertiajs/vue3";
 
 const props = defineProps({
     status: String,
-})
+});
 
-const form = useForm({})
+const form = useForm({});
 
 const submit = () => {
-    form.post('/email/verification-notification')
-}
+    form.post(route("verification.send"));
+};
 
 const verificationLinkSent = computed(
-    () => props.status === 'verification-link-sent'
-)
+    () => props.status === "verification-link-sent"
+);
 </script>
 
 <template>
@@ -37,8 +37,8 @@ const verificationLinkSent = computed(
         <!-- Description -->
         <p class="text-center text-gray-600 text-sm mb-6">
             Kami telah mengirimkan email verifikasi ke alamat email kamu.
-            Silakan cek inbox atau folder spam, lalu klik link verifikasi
-            untuk mulai menggunakan Event Run.
+            Silakan cek inbox atau folder spam, lalu klik link verifikasi untuk
+            mulai menggunakan Event Run.
         </p>
 
         <!-- Alert -->

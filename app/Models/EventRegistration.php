@@ -16,6 +16,7 @@ class EventRegistration extends Model
         'address',
         'phone',
         'email',
+        'gender',
         'illness',
         'shirt_size',
         'payment_method',
@@ -26,6 +27,7 @@ class EventRegistration extends Model
         'verified_by',
         'rejection_reason',
         'registration_code',
+        'bib_number',
     ];
 
     protected $casts = [

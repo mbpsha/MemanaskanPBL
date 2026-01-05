@@ -5,6 +5,8 @@ use App\Http\Controllers\Api\RegistrationController;
 use App\Http\Controllers\Admin\RegistrationManagementController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\PaymentVerificationController;
+use App\Http\Controllers\Admin\RacepackController;
+use App\Http\Controllers\Admin\ScannerController;
 use App\Http\Controllers\EventRegistrationController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
@@ -14,6 +16,12 @@ use Inertia\Inertia;
 Route::get('/', function () {
     return Inertia::render('Landing');
 });
+
+// Dashboard - redirect to landing page
+Route::get('/dashboard', function () {
+    return redirect('/');
+})->middleware(['auth'])->name('dashboard');
+
 
 // Event Registration API
 Route::prefix('api')->group(function () {
@@ -30,7 +38,10 @@ Route::prefix('api')->group(function () {
     Route::get('/registrations', [RegistrationController::class, 'index']);
 });
 
-Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
+// Public QR Code Verification (no authentication required)
+Route::get('/verify/{code}', [ScannerController::class, 'publicVerify'])->name('verify.public');
+
+Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     // User Management
     Route::get('/users', [UserController::class, 'index'])->name('users.index');
     Route::post('/users', [UserController::class, 'store'])->name('users.store');
@@ -52,6 +63,13 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
 
     // Export
     Route::get('/registrations/export/csv', [RegistrationManagementController::class, 'export'])->name('registrations.export');
+
+    // Racepack Collection
+    Route::post('/racepack/scan', [RacepackController::class, 'updateStatus'])->name('racepack.scan');
+
+    // Barcode Scanner
+    Route::get('/scan', [ScannerController::class, 'index'])->name('scan.index');
+    Route::post('/scan/verify', [ScannerController::class, 'verify'])->name('scan.verify');
 });
 
 Route::middleware('auth')->group(function () {
@@ -63,4 +81,4 @@ Route::middleware('auth')->group(function () {
     Route::post('/event-registrations', [EventRegistrationController::class, 'store'])->name('event.registrations.post');
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
