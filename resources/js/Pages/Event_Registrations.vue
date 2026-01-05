@@ -199,10 +199,17 @@ const submit = () => {
                         <div class="p-4 bg-gray-50 rounded-lg">
                             <p class="font-medium">Nama Penerima:</p>
                             <p class="mb-3 text-lg font-bold text-[#1FB5D5]"> a.n Lisak Yiha Rodliyah </p>
+<<<<<<< HEAD
 
                             <p class="font-medium">Bank:</p>
                             <p class="mb-3 text-lg font-bold text-[#1FB5D5]"> 🏦 BRI </p>
 
+=======
+                            
+                            <p class="font-medium">Bank:</p>
+                            <p class="mb-3 text-lg font-bold text-[#1FB5D5]"> 🏦 BRI </p>
+                            
+>>>>>>> dbb1b47ddd24da4dcf572c1818bfda39723efcda
                             <p class="font-medium">Nomor Rekening:</p>
                             <p class="text-xl font-bold text-[#1FB5D5]"> 7672 01 005378 53 1 </p>
                         </div>
