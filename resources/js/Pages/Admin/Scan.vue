@@ -7,6 +7,7 @@ import {
     QrCodeIcon,
     CheckCircleIcon,
     XCircleIcon,
+    ArrowPathIcon,
 } from "@heroicons/vue/24/outline";
 
 const videoRef = ref(null);
@@ -16,6 +17,57 @@ const scannedCode = ref("");
 const scanResult = ref(null);
 const error = ref("");
 const loading = ref(false);
+const availableCameras = ref([]);
+const selectedCamera = ref(null);
+const facingMode = ref("environment"); // "environment" for back camera, "user" for front camera
+
+// List available cameras
+const listCameras = async () => {
+    try {
+        const devices = await codeReader.value.listVideoInputDevices();
+        availableCameras.value = devices;
+
+        // Try to find back camera (environment)
+        const backCamera = devices.find(
+            (device) =>
+                device.label.toLowerCase().includes("back") ||
+                device.label.toLowerCase().includes("rear") ||
+                device.label.toLowerCase().includes("environment")
+        );
+
+        // If back camera found, use it, otherwise use first camera
+        selectedCamera.value = backCamera
+            ? backCamera.deviceId
+            : devices[0]?.deviceId || null;
+
+        return devices;
+    } catch (err) {
+        console.error("Error listing cameras:", err);
+        return [];
+    }
+};
+
+// Switch camera
+const switchCamera = async () => {
+    if (availableCameras.value.length <= 1) {
+        return; // No other cameras to switch to
+    }
+
+    // Stop current scanning
+    stopScanning();
+
+    // Find current camera index
+    const currentIndex = availableCameras.value.findIndex(
+        (cam) => cam.deviceId === selectedCamera.value
+    );
+
+    // Switch to next camera (circular)
+    const nextIndex = (currentIndex + 1) % availableCameras.value.length;
+    selectedCamera.value = availableCameras.value[nextIndex].deviceId;
+
+    // Restart scanning with new camera
+    await startScanning();
+};
 
 // Start camera and scanner
 const startScanning = async () => {
@@ -23,20 +75,21 @@ const startScanning = async () => {
         error.value = "";
         scanning.value = true;
 
-        codeReader.value = new BrowserMultiFormatReader();
+        if (!codeReader.value) {
+            codeReader.value = new BrowserMultiFormatReader();
+        }
 
-        const videoInputDevices =
-            await codeReader.value.listVideoInputDevices();
+        const videoInputDevices = await listCameras();
 
         if (videoInputDevices.length === 0) {
             throw new Error("Tidak ada kamera yang ditemukan");
         }
 
-        // Use back camera if available (usually index 0 on mobile)
-        const selectedDeviceId = videoInputDevices[0].deviceId;
+        // Use selected camera or default to first available
+        const deviceId = selectedCamera.value || videoInputDevices[0].deviceId;
 
         await codeReader.value.decodeFromVideoDevice(
-            selectedDeviceId,
+            deviceId,
             videoRef.value,
             async (result, err) => {
                 if (result) {
@@ -80,9 +133,9 @@ const verifyCode = async (code) => {
     let registrationCode = code;
     try {
         // Check if code is a URL
-        if (code.startsWith('http://') || code.startsWith('https://')) {
+        if (code.startsWith("http://") || code.startsWith("https://")) {
             const url = new URL(code);
-            const codeParam = url.searchParams.get('code');
+            const codeParam = url.searchParams.get("code");
             if (codeParam) {
                 registrationCode = codeParam;
             }
@@ -93,12 +146,17 @@ const verifyCode = async (code) => {
     }
 
     try {
-        const response = await fetch(route("admin.scan.verify") + "?code=" + encodeURIComponent(registrationCode), {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-            },
-        });
+        const response = await fetch(
+            route("admin.scan.verify") +
+                "?code=" +
+                encodeURIComponent(registrationCode),
+            {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            }
+        );
 
         const data = await response.json();
 
@@ -150,7 +208,7 @@ const manualVerify = async () => {
 onMounted(() => {
     // Check if there's a code in URL query parameter
     const urlParams = new URLSearchParams(window.location.search);
-    const codeFromUrl = urlParams.get('code');
+    const codeFromUrl = urlParams.get("code");
 
     if (codeFromUrl) {
         // If code is in URL, verify it directly without starting camera
@@ -169,12 +227,12 @@ onUnmounted(() => {
 
 <template>
     <AdminLayout>
-        <div class="max-w-4xl mx-auto">
-            <div class="mb-8">
-                <h1 class="text-3xl font-bold text-gray-800">
+        <div class="max-w-4xl mx-auto px-4 sm:px-0">
+            <div class="mb-6 sm:mb-8">
+                <h1 class="text-2xl sm:text-3xl font-bold text-gray-800">
                     Scan QR Code Peserta
                 </h1>
-                <p class="mt-2 text-gray-600">
+                <p class="mt-2 text-sm sm:text-base text-gray-600">
                     Scan QR code dari email konfirmasi peserta untuk verifikasi
                     pengambilan racepack
                 </p>
@@ -182,7 +240,7 @@ onUnmounted(() => {
 
             <!-- Scanner Card -->
             <div class="mb-6 overflow-hidden bg-white shadow-lg rounded-xl">
-                <div class="p-6">
+                <div class="p-4 sm:p-6">
                     <!-- Video Preview -->
                     <div
                         class="relative mb-4 overflow-hidden bg-black rounded-lg"
@@ -195,27 +253,91 @@ onUnmounted(() => {
                             playsinline
                         ></video>
 
+                        <!-- Camera Info Badge -->
+                        <div
+                            v-if="scanning && availableCameras.length > 0"
+                            class="absolute top-2 left-2 sm:top-4 sm:left-4 bg-black/70 text-white px-2 sm:px-3 py-1 sm:py-2 rounded-lg text-xs sm:text-sm"
+                        >
+                            <span class="hidden sm:inline">
+                                {{
+                                    availableCameras.find(
+                                        (c) => c.deviceId === selectedCamera
+                                    )?.label || "Kamera"
+                                }}
+                            </span>
+                            <span class="sm:hidden">
+                                Kamera
+                                {{
+                                    availableCameras.findIndex(
+                                        (c) => c.deviceId === selectedCamera
+                                    ) + 1
+                                }}/{{ availableCameras.length }}
+                            </span>
+                        </div>
+
+                        <!-- Switch Camera Button -->
+                        <button
+                            v-if="scanning && availableCameras.length > 1"
+                            @click="switchCamera"
+                            class="absolute top-2 right-2 sm:top-4 sm:right-4 bg-white/90 hover:bg-white text-gray-800 p-2 sm:p-3 rounded-full shadow-lg transition-all hover:scale-110 active:scale-95"
+                            title="Ganti Kamera"
+                        >
+                            <ArrowPathIcon class="w-5 h-5 sm:w-6 sm:h-6" />
+                        </button>
+
                         <!-- Scanning Overlay -->
                         <div
                             v-if="scanning && !scanResult"
                             class="absolute inset-0 flex items-center justify-center pointer-events-none"
                         >
                             <!-- Dark overlay outside scan area -->
-                            <div class="absolute inset-0 bg-black bg-opacity-60"></div>
+                            <div
+                                class="absolute inset-0 bg-black bg-opacity-60"
+                            ></div>
 
                             <!-- Scan frame container -->
-                            <div class="relative" style="width: 70%; aspect-ratio: 1/1;">
+                            <div
+                                class="relative"
+                                style="width: 70%; aspect-ratio: 1/1"
+                            >
                                 <!-- Transparent center (cut-out effect) -->
-                                <div class="absolute inset-0 bg-transparent border-4 border-green-500 rounded-lg" style="box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.6);"></div>
+                                <div
+                                    class="absolute inset-0 bg-transparent border-4 border-green-500 rounded-lg"
+                                    style="
+                                        box-shadow: 0 0 0 9999px
+                                            rgba(0, 0, 0, 0.6);
+                                    "
+                                ></div>
 
                                 <!-- Corner markers -->
-                                <div class="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-green-400"></div>
-                                <div class="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-green-400"></div>
-                                <div class="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-green-400"></div>
-                                <div class="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-green-400"></div>
+                                <div
+                                    class="absolute top-0 left-0 w-6 h-6 sm:w-8 sm:h-8 border-t-4 border-l-4 border-green-400"
+                                ></div>
+                                <div
+                                    class="absolute top-0 right-0 w-6 h-6 sm:w-8 sm:h-8 border-t-4 border-r-4 border-green-400"
+                                ></div>
+                                <div
+                                    class="absolute bottom-0 left-0 w-6 h-6 sm:w-8 sm:h-8 border-b-4 border-l-4 border-green-400"
+                                ></div>
+                                <div
+                                    class="absolute bottom-0 right-0 w-6 h-6 sm:w-8 sm:h-8 border-b-4 border-r-4 border-green-400"
+                                ></div>
 
                                 <!-- Scanning animation line -->
-                                <div class="absolute inset-x-0 top-0 h-1 bg-green-400 animate-scan"></div>
+                                <div
+                                    class="absolute inset-x-0 top-0 h-1 bg-green-400 animate-scan"
+                                ></div>
+                            </div>
+
+                            <!-- Instruction Text -->
+                            <div
+                                class="absolute bottom-4 sm:bottom-8 left-0 right-0 text-center"
+                            >
+                                <p
+                                    class="text-white text-xs sm:text-sm font-medium bg-black/50 px-3 sm:px-4 py-1 sm:py-2 rounded-full inline-block"
+                                >
+                                    Arahkan QR Code ke area hijau
+                                </p>
                             </div>
                         </div>
 
@@ -226,9 +348,9 @@ onUnmounted(() => {
                         >
                             <div class="text-center text-white">
                                 <div
-                                    class="w-16 h-16 mx-auto mb-4 border-b-2 border-white rounded-full animate-spin"
+                                    class="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-3 sm:mb-4 border-b-2 border-white rounded-full animate-spin"
                                 ></div>
-                                <p class="text-lg font-semibold">
+                                <p class="text-base sm:text-lg font-semibold">
                                     Memverifikasi...
                                 </p>
                             </div>
@@ -240,11 +362,13 @@ onUnmounted(() => {
                             class="absolute inset-0 flex items-center justify-center p-4 bg-red-600 bg-opacity-90"
                         >
                             <div class="max-w-md text-center text-white">
-                                <XCircleIcon class="w-20 h-20 mx-auto mb-4" />
-                                <p class="mb-2 text-xl font-bold">
+                                <XCircleIcon
+                                    class="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-3 sm:mb-4"
+                                />
+                                <p class="mb-2 text-lg sm:text-xl font-bold">
                                     {{ error }}
                                 </p>
-                                <p class="text-sm">
+                                <p class="text-xs sm:text-sm">
                                     Scanner akan dimulai ulang otomatis...
                                 </p>
                             </div>
@@ -252,19 +376,19 @@ onUnmounted(() => {
                     </div>
 
                     <!-- Manual Entry -->
-                    <div class="space-y-4">
-                        <div class="flex gap-2">
+                    <div class="space-y-3 sm:space-y-4">
+                        <div class="flex flex-col sm:flex-row gap-2">
                             <input
                                 v-model="scannedCode"
                                 type="text"
                                 placeholder="Atau masukkan kode registrasi manual (e.g., REG-XXXXXXXXXX)"
-                                class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                class="flex-1 px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                                 @keyup.enter="manualVerify"
                             />
                             <button
                                 @click="manualVerify"
                                 :disabled="loading || !scannedCode.trim()"
-                                class="px-6 py-3 font-semibold text-white transition bg-indigo-600 rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                                class="px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-semibold text-white transition bg-indigo-600 rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
                             >
                                 Verifikasi
                             </button>
@@ -275,15 +399,15 @@ onUnmounted(() => {
                             <button
                                 v-if="!scanning"
                                 @click="startScanning"
-                                class="flex items-center justify-center flex-1 gap-2 px-4 py-3 font-semibold text-white transition bg-green-600 rounded-lg hover:bg-green-700"
+                                class="flex items-center justify-center flex-1 gap-2 px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base font-semibold text-white transition bg-green-600 rounded-lg hover:bg-green-700"
                             >
-                                <QrCodeIcon class="w-5 h-5" />
+                                <QrCodeIcon class="w-4 h-4 sm:w-5 sm:h-5" />
                                 Mulai Scan
                             </button>
                             <button
                                 v-else
                                 @click="stopScanning"
-                                class="flex-1 px-4 py-3 font-semibold text-white transition bg-red-600 rounded-lg hover:bg-red-700"
+                                class="flex-1 px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base font-semibold text-white transition bg-red-600 rounded-lg hover:bg-red-700"
                             >
                                 Stop Scan
                             </button>
@@ -298,7 +422,7 @@ onUnmounted(() => {
                 class="overflow-hidden bg-white shadow-lg rounded-xl"
             >
                 <div
-                    class="p-6"
+                    class="p-4 sm:p-6"
                     :class="
                         scanResult.verified
                             ? 'bg-gradient-to-br from-green-50 to-emerald-50'
@@ -306,27 +430,34 @@ onUnmounted(() => {
                     "
                 >
                     <!-- Success -->
-                    <div v-if="scanResult.verified" class="mb-6 text-center">
+                    <div
+                        v-if="scanResult.verified"
+                        class="mb-4 sm:mb-6 text-center"
+                    >
                         <CheckCircleIcon
-                            class="w-24 h-24 mx-auto mb-4 text-green-600"
+                            class="w-16 h-16 sm:w-24 sm:h-24 mx-auto mb-3 sm:mb-4 text-green-600"
                         />
-                        <h2 class="mb-2 text-3xl font-bold text-green-800">
+                        <h2
+                            class="mb-2 text-2xl sm:text-3xl font-bold text-green-800"
+                        >
                             ✓ TERVERIFIKASI
                         </h2>
-                        <p class="text-lg text-green-700">
+                        <p class="text-base sm:text-lg text-green-700">
                             Peserta valid dan sudah membayar
                         </p>
                     </div>
 
                     <!-- Warning (Not Verified) -->
-                    <div v-else class="mb-6 text-center">
+                    <div v-else class="mb-4 sm:mb-6 text-center">
                         <XCircleIcon
-                            class="w-24 h-24 mx-auto mb-4 text-orange-600"
+                            class="w-16 h-16 sm:w-24 sm:h-24 mx-auto mb-3 sm:mb-4 text-orange-600"
                         />
-                        <h2 class="mb-2 text-3xl font-bold text-orange-800">
+                        <h2
+                            class="mb-2 text-2xl sm:text-3xl font-bold text-orange-800"
+                        >
                             ⚠ BELUM TERVERIFIKASI
                         </h2>
-                        <p class="text-lg text-orange-700">
+                        <p class="text-base sm:text-lg text-orange-700">
                             Status:
                             {{
                                 scanResult.participant.payment_status.toUpperCase()
@@ -335,49 +466,73 @@ onUnmounted(() => {
                     </div>
 
                     <!-- Participant Details -->
-                    <div class="p-6 mb-6 bg-white rounded-lg shadow-md">
+                    <div
+                        class="p-4 sm:p-6 mb-4 sm:mb-6 bg-white rounded-lg shadow-md"
+                    >
                         <h3
-                            class="pb-2 mb-4 text-xl font-bold text-gray-800 border-b"
+                            class="pb-2 mb-3 sm:mb-4 text-lg sm:text-xl font-bold text-gray-800 border-b"
                         >
                             Data Peserta
                         </h3>
-                        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                        <div
+                            class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4"
+                        >
                             <div>
-                                <p class="text-sm text-gray-600">Nama</p>
-                                <p class="text-lg font-semibold text-gray-800">
+                                <p class="text-xs sm:text-sm text-gray-600">
+                                    Nama
+                                </p>
+                                <p
+                                    class="text-sm sm:text-lg font-semibold text-gray-800"
+                                >
                                     {{ scanResult.participant.name }}
                                 </p>
                             </div>
                             <div>
-                                <p class="text-sm text-gray-600">NIK</p>
-                                <p class="text-lg font-semibold text-gray-800">
+                                <p class="text-xs sm:text-sm text-gray-600">
+                                    NIK
+                                </p>
+                                <p
+                                    class="text-sm sm:text-lg font-semibold text-gray-800"
+                                >
                                     {{ scanResult.participant.nik }}
                                 </p>
                             </div>
                             <div>
-                                <p class="text-sm text-gray-600">Email</p>
-                                <p class="text-lg font-semibold text-gray-800">
+                                <p class="text-xs sm:text-sm text-gray-600">
+                                    Email
+                                </p>
+                                <p
+                                    class="text-sm sm:text-lg font-semibold text-gray-800 break-all"
+                                >
                                     {{ scanResult.participant.email }}
                                 </p>
                             </div>
                             <div>
-                                <p class="text-sm text-gray-600">Telepon</p>
-                                <p class="text-lg font-semibold text-gray-800">
+                                <p class="text-xs sm:text-sm text-gray-600">
+                                    Telepon
+                                </p>
+                                <p
+                                    class="text-sm sm:text-lg font-semibold text-gray-800"
+                                >
                                     {{ scanResult.participant.phone }}
                                 </p>
                             </div>
                             <div>
-                                <p class="text-sm text-gray-600">Ukuran Kaos</p>
-                                <p class="text-lg font-semibold text-gray-800">
+                                <p class="text-xs sm:text-sm text-gray-600">
+                                    Ukuran Kaos
+                                </p>
+                                <p
+                                    class="text-sm sm:text-lg font-semibold text-gray-800"
+                                >
                                     {{ scanResult.participant.shirt_size }}
                                 </p>
                             </div>
                             <div>
-                                <p class="text-sm text-gray-600">
+                                <p class="text-xs sm:text-sm text-gray-600">
                                     Kode Registrasi
                                 </p>
                                 <p
-                                    class="text-lg font-semibold text-indigo-600"
+                                    class="text-sm sm:text-lg font-semibold text-indigo-600 break-all"
                                 >
                                     {{
                                         scanResult.participant.registration_code
@@ -388,12 +543,14 @@ onUnmounted(() => {
                                 v-if="
                                     scanResult.participant.payment_verified_at
                                 "
-                                class="md:col-span-2"
+                                class="sm:col-span-2"
                             >
-                                <p class="text-sm text-gray-600">
+                                <p class="text-xs sm:text-sm text-gray-600">
                                     Tanggal Verifikasi
                                 </p>
-                                <p class="text-lg font-semibold text-gray-800">
+                                <p
+                                    class="text-sm sm:text-lg font-semibold text-gray-800"
+                                >
                                     {{
                                         scanResult.participant
                                             .payment_verified_at
@@ -406,7 +563,7 @@ onUnmounted(() => {
                     <!-- Action Button -->
                     <button
                         @click="resetScan"
-                        class="w-full px-6 py-4 text-lg font-bold text-white transition bg-indigo-600 rounded-lg hover:bg-indigo-700"
+                        class="w-full px-4 sm:px-6 py-3 sm:py-4 text-base sm:text-lg font-bold text-white transition bg-indigo-600 rounded-lg hover:bg-indigo-700"
                     >
                         Scan Peserta Berikutnya
                     </button>
