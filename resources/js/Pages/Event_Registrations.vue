@@ -141,12 +141,23 @@ const submit = () => {
                         <label class="label">Ukuran Jersey <span class="text-red-600">*</span></label>
                         <select v-model="form.shirt_size" class="input" required>
                             <option disabled value="">Klik untuk Pilih Ukuran Jersey</option>
+                            <option>XS</option>
                             <option>S</option>
                             <option>M</option>
                             <option>L</option>
                             <option>XL</option>
+                            <option>XXL</option>
                         </select>
                     </div>
+                </div>
+
+                <!-- Panduan Ukuran Jersey -->
+                <div class="mt-6 p-4 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-lg border border-[#1FB5D5]">
+                    <h4 class="text-sm font-semibold mb-3 text-center text-[#1FB5D5]">Panduan Ukuran Jersey</h4>
+                    <img src="/images/sizeKaos.jpeg" alt="Panduan Ukuran Jersey" class="w-full max-w-sm mx-auto rounded-lg shadow-md" />
+                    <p class="mt-3 text-xs text-center text-gray-600">
+                        Silakan lihat panduan ukuran di atas untuk memilih ukuran jersey yang sesuai
+                    </p>
                 </div>
             </div>
 
@@ -154,7 +165,7 @@ const submit = () => {
             <h2 class="section-title">Halaman Pembayaran</h2>
 
             <div class="mb-12 card">
-                <h3 class="mb-6 text-lg font-bold text-center">Jenis Ticket</h3>
+                <h3 class="mb-6 text-lg font-bold text-center">Jenis Tiket</h3>
 
                 <!-- TIKET -->
                 <div class="flex flex-wrap justify-center gap-6 mb-8">
@@ -196,24 +207,16 @@ const submit = () => {
 
                     <div class="space-y-2 text-sm">
                         <p class="mb-2 font-semibold">Informasi Rekening</p>
-                        <div class="p-4 bg-gray-50 rounded-lg">
+                        <div class="p-4 rounded-lg bg-gray-50">
                             <p class="font-medium">Nama Penerima:</p>
                             <p class="mb-3 text-lg font-bold text-[#1FB5D5]"> a.n Lisak Yiha Rodliyah </p>
-<<<<<<< HEAD
 
                             <p class="font-medium">Bank:</p>
                             <p class="mb-3 text-lg font-bold text-[#1FB5D5]"> 🏦 BRI </p>
-
-=======
-                            
-                            <p class="font-medium">Bank:</p>
-                            <p class="mb-3 text-lg font-bold text-[#1FB5D5]"> 🏦 BRI </p>
-                            
->>>>>>> dbb1b47ddd24da4dcf572c1818bfda39723efcda
                             <p class="font-medium">Nomor Rekening:</p>
                             <p class="text-xl font-bold text-[#1FB5D5]"> 7672 01 005378 53 1 </p>
                         </div>
-                        <p class="text-xs text-gray-500 italic">
+                        <p class="text-xs italic text-gray-500">
                             * Mohon transfer sesuai dengan total harga yang tertera agar proses verifikasi berjalan lancar
                         </p>
                     </div>

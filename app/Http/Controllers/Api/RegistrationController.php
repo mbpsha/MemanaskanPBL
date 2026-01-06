@@ -23,7 +23,7 @@ class RegistrationController extends Controller
             'email' => 'required|email|max:255',
             'gender' => 'required|in:M,F',
             'illness' => 'nullable|string',
-            'shirt_size' => 'required|in:S,M,L,XL',
+            'shirt_size' => 'required|in:XS,S,M,L,XL,XXL',
             'payment_method' => 'nullable|string|max:100',
         ]);
 
