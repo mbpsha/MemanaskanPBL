@@ -44,7 +44,7 @@ const emit = defineEmits(["close"]);
                 :class="
                     $page.url.startsWith('/admin/users')
                         ? 'text-indigo-600 font-medium bg-indigo-50'
-                        : 'text-gray-500'
+                        : 'text-gray-400'
                 "
             >
                 <UsersIcon class="w-5 h-5" />
@@ -72,7 +72,7 @@ const emit = defineEmits(["close"]);
                 :class="
                     $page.url.startsWith('/admin/scan')
                         ? 'text-indigo-600 font-medium bg-indigo-50'
-                        : 'text-gray-500'
+                        : 'text-gray-400'
                 "
             >
                 <QrCodeIcon class="w-5 h-5" />
