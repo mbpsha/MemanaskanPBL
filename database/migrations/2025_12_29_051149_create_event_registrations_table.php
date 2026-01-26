@@ -15,7 +15,7 @@ return new class extends Migration {
             $table->string('phone');
             $table->string('email');
             $table->text('illness')->nullable(); // Medical conditions
-            $table->enum('shirt_size', ['S', 'M', 'L', 'XL']);
+            $table->enum('shirt_size', ['XS', 'S', 'M', 'L', 'XL', 'XXL']);
             $table->string('payment_method')->nullable();
 
             // Payment proof
