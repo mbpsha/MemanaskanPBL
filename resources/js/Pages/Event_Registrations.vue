@@ -31,7 +31,6 @@ const currentDate = computed(() => {
 })
 
 const tickets = [
-    { name: 'Tiket Basic', price: 100000 },
     { name: 'Tiket Fun Run + Support Syiar Ramadan', price: 130000 },
 ]
 

@@ -91,44 +91,69 @@ const confirmDelete = () => {
 
 <template>
     <AdminLayout>
-        <!-- <h1 class="text-xl font-semibold text-gray-800">
-        Pengguna
-    </h1> -->
-
         <!-- PAGE HEADER -->
         <div class="mb-4 sm:mb-6">
-            <!-- TITLE -->
-            <h1 class="text-xl sm:text-2xl font-semibold text-gray-800 mb-4">
+            <h1 class="text-xl sm:text-2xl font-semibold text-gray-800">
                 Pengguna
             </h1>
         </div>
 
+        <!-- FILTERS -->
+        <div class="bg-white rounded-xl p-4 sm:p-6 mb-4 sm:mb-6 shadow-sm">
+            <div class="flex flex-col sm:flex-row gap-3 sm:gap-4">
+                <!-- Search -->
+                <div class="flex-1">
+                    <label
+                        class="block text-xs sm:text-sm font-medium text-gray-700 mb-2"
+                        >Cari</label
+                    >
+                    <input
+                        v-model="search"
+                        type="text"
+                        placeholder="Nama atau Email"
+                        class="w-full px-3 sm:px-4 py-2 text-xs sm:text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                    />
+                </div>
+
+                <!-- Button -->
+                <div class="flex items-end sm:flex-shrink-0">
+                    <button
+                        @click="openCreate"
+                        class="w-full sm:w-auto px-4 py-2 text-sm sm:text-base text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition whitespace-nowrap"
+                    >
+                        Tambah Pengguna
+                    </button>
+                </div>
+            </div>
+        </div>
+
         <!-- TABLE -->
-        <UserTable
-            :users="users.data"
-            @create="openCreate"
-            @edit="openEdit"
-            @delete="openDelete"
-        />
+        <UserTable :users="users.data" @edit="openEdit" @delete="openDelete" />
 
         <!-- PAGINATION -->
-        <div class="flex justify-end mt-6">
-            <div class="flex gap-2">
-                <button
-                    v-for="link in users.links"
-                    :key="link.label"
-                    v-html="link.label"
-                    :disabled="!link.url"
-                    @click="
-                        link.url &&
-                            router.get(link.url, {}, { preserveState: true })
-                    "
-                    class="px-3 py-1 text-sm rounded-lg border"
-                    :class="{
-                        'bg-blue-600 text-white': link.active,
-                        'text-gray-400 cursor-not-allowed': !link.url,
-                    }"
-                />
+        <div class="bg-white rounded-xl p-4 sm:p-6 mt-4 sm:mt-6 shadow-sm">
+            <div class="flex justify-end">
+                <div class="flex gap-2">
+                    <button
+                        v-for="link in users.links"
+                        :key="link.label"
+                        v-html="link.label"
+                        :disabled="!link.url"
+                        @click="
+                            link.url &&
+                                router.get(
+                                    link.url,
+                                    {},
+                                    { preserveState: true }
+                                )
+                        "
+                        class="px-3 py-1 text-sm rounded-lg border"
+                        :class="{
+                            'bg-blue-600 text-white': link.active,
+                            'text-gray-400 cursor-not-allowed': !link.url,
+                        }"
+                    />
+                </div>
             </div>
         </div>
 

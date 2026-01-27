@@ -1,11 +1,5 @@
 <script setup>
-import { ref, computed } from "vue";
-import {
-    PencilSquareIcon,
-    TrashIcon,
-    PlusIcon,
-    MagnifyingGlassIcon,
-} from "@heroicons/vue/24/outline";
+import { PencilSquareIcon, TrashIcon } from "@heroicons/vue/24/outline";
 
 const props = defineProps({
     users: {
@@ -14,58 +8,13 @@ const props = defineProps({
     },
 });
 
-const emit = defineEmits(["create", "edit", "delete"]);
-
-/* =====================
-   SEARCH STATE
-===================== */
-const search = ref("");
-
-const filteredUsers = computed(() => {
-    if (!search.value) return props.users;
-
-    const keyword = search.value.toLowerCase();
-
-    return props.users.filter(
-        (user) =>
-            user.name.toLowerCase().includes(keyword) ||
-            user.email.toLowerCase().includes(keyword)
-    );
-});
+const emit = defineEmits(["edit", "delete"]);
 </script>
 
 <template>
     <div
         class="px-4 py-4 sm:px-6 sm:py-6 lg:px-8 bg-white shadow-sm rounded-2xl"
     >
-        <!-- HEADER -->
-        <div
-            class="flex flex-col gap-4 mb-4 sm:mb-6 sm:flex-row sm:justify-end sm:items-center"
-        >
-            <!-- SEARCH -->
-            <div class="relative w-full sm:w-72">
-                <MagnifyingGlassIcon
-                    class="absolute w-4 h-4 sm:w-5 sm:h-5 text-gray-400 -translate-y-1/2 left-3 top-1/2"
-                />
-                <input
-                    v-model="search"
-                    type="text"
-                    placeholder="Cari username atau email..."
-                    class="w-full py-2 pl-9 sm:pl-10 pr-4 text-xs sm:text-sm border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
-            </div>
-
-            <!-- BUTTON -->
-            <button
-                @click="emit('create')"
-                class="flex items-center justify-center gap-2 px-4 py-2 text-sm sm:text-base text-white transition bg-blue-600 rounded-lg hover:bg-blue-700 whitespace-nowrap"
-            >
-                <PlusIcon class="w-4 h-4 sm:w-5 sm:h-5" />
-                <span class="hidden sm:inline">Tambahkan Pengguna</span>
-                <span class="sm:hidden">Tambah</span>
-            </button>
-        </div>
-
         <!-- TABLE -->
         <div class="overflow-x-auto -mx-4 sm:mx-0">
             <div class="inline-block min-w-full align-middle">
@@ -100,7 +49,7 @@ const filteredUsers = computed(() => {
 
                         <tbody>
                             <tr
-                                v-for="user in filteredUsers"
+                                v-for="user in users"
                                 :key="user.id"
                                 class="transition border-b last:border-none hover:bg-gray-50"
                             >
@@ -161,7 +110,7 @@ const filteredUsers = computed(() => {
                             </tr>
 
                             <!-- EMPTY STATE -->
-                            <tr v-if="filteredUsers.length === 0">
+                            <tr v-if="users.length === 0">
                                 <td
                                     colspan="4"
                                     class="py-8 sm:py-10 text-center text-gray-400 text-xs sm:text-sm"
