@@ -28,10 +28,13 @@ class EventRegistration extends Model
         'rejection_reason',
         'registration_code',
         'bib_number',
+        'racepack_collected_at',
+        'collected_by',
     ];
 
     protected $casts = [
         'payment_verified_at' => 'datetime',
+        'racepack_collected_at' => 'datetime',
     ];
 
     /**

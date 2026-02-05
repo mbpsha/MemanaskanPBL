@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\EventRegistration;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class ScannerController extends Controller
@@ -84,18 +85,41 @@ class ScannerController extends Controller
             ], 404);
         }
 
+        // Check if racepack has already been collected
+        if ($registration->racepack_collected_at) {
+            return response()->json([
+                'ok' => true,
+                'already_collected' => true,
+                'message' => 'Barcode ini sudah pernah digunakan!',
+                'participant' => [
+                    'name' => $registration->name,
+                    'nik' => $registration->nik,
+                    'email' => $registration->email,
+                    'phone' => $registration->phone,
+                    'shirt_size' => $registration->shirt_size,
+                    'registration_code' => $registration->registration_code,
+                    'payment_status' => $registration->payment_status,
+                    'payment_verified_at' => $registration->payment_verified_at?->format('d F Y, H:i'),
+                    'racepack_collected_at' => $registration->racepack_collected_at?->format('d F Y, H:i'),
+                ],
+            ]);
+        }
+
         // Check if payment is verified
         $isVerified = $registration->payment_status === 'verified';
 
-        // Update payment status to "done" when scanned (only if currently verified)
+        // Update payment status to "done" and set racepack_collected_at when scanned (only if currently verified)
         if ($registration->payment_status === 'verified') {
             $registration->payment_status = 'done';
+            $registration->racepack_collected_at = now();
+            $registration->collected_by = Auth::check() ? Auth::id() : null;
             $registration->save();
         }
 
         return response()->json([
             'ok' => true,
-            'verified' => $isVerified || $registration->payment_status === 'done', // Allow already collected participants
+            'verified' => $isVerified || $registration->payment_status === 'done',
+            'already_collected' => false,
             'participant' => [
                 'name' => $registration->name,
                 'nik' => $registration->nik,
@@ -105,6 +129,7 @@ class ScannerController extends Controller
                 'registration_code' => $registration->registration_code,
                 'payment_status' => $registration->payment_status,
                 'payment_verified_at' => $registration->payment_verified_at?->format('d F Y, H:i'),
+                'racepack_collected_at' => $registration->racepack_collected_at?->format('d F Y, H:i'),
             ],
         ]);
     }

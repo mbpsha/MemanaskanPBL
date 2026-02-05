@@ -32,7 +32,7 @@ const listCameras = async () => {
             (device) =>
                 device.label.toLowerCase().includes("back") ||
                 device.label.toLowerCase().includes("rear") ||
-                device.label.toLowerCase().includes("environment")
+                device.label.toLowerCase().includes("environment"),
         );
 
         // If back camera found, use it, otherwise use first camera
@@ -58,7 +58,7 @@ const switchCamera = async () => {
 
     // Find current camera index
     const currentIndex = availableCameras.value.findIndex(
-        (cam) => cam.deviceId === selectedCamera.value
+        (cam) => cam.deviceId === selectedCamera.value,
     );
 
     // Switch to next camera (circular)
@@ -102,7 +102,7 @@ const startScanning = async () => {
                 if (err && !(err.name === "NotFoundException")) {
                     console.error("Scan error:", err);
                 }
-            }
+            },
         );
     } catch (err) {
         console.error("Error starting scanner:", err);
@@ -155,7 +155,7 @@ const verifyCode = async (code) => {
                 headers: {
                     "Content-Type": "application/json",
                 },
-            }
+            },
         );
 
         const data = await response.json();
@@ -167,7 +167,7 @@ const verifyCode = async (code) => {
 
             // Play success sound (optional)
             const audio = new Audio(
-                "data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLaiTcIGWi77eefTRAMUKfj8LZjHAY4ktfyy3ksBSR3x/DdkEAKFF606OvYVRQKRKDh8r5sIQU"
+                "data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLaiTcIGWi77eefTRAMUKfj8LZjHAY4ktfyy3ksBSR3x/DdkEAKFF606OvYVRQKRKDh8r5sIQU",
             );
             audio.play().catch(() => {});
         } else {
@@ -261,7 +261,7 @@ onUnmounted(() => {
                             <span class="hidden sm:inline">
                                 {{
                                     availableCameras.find(
-                                        (c) => c.deviceId === selectedCamera
+                                        (c) => c.deviceId === selectedCamera,
                                     )?.label || "Kamera"
                                 }}
                             </span>
@@ -269,7 +269,7 @@ onUnmounted(() => {
                                 Kamera
                                 {{
                                     availableCameras.findIndex(
-                                        (c) => c.deviceId === selectedCamera
+                                        (c) => c.deviceId === selectedCamera,
                                     ) + 1
                                 }}/{{ availableCameras.length }}
                             </span>
@@ -424,14 +424,41 @@ onUnmounted(() => {
                 <div
                     class="p-4 sm:p-6"
                     :class="
-                        scanResult.verified
-                            ? 'bg-gradient-to-br from-green-50 to-emerald-50'
-                            : 'bg-gradient-to-br from-yellow-50 to-orange-50'
+                        scanResult.already_collected
+                            ? 'bg-gradient-to-br from-red-50 to-red-100'
+                            : scanResult.verified
+                              ? 'bg-gradient-to-br from-green-50 to-emerald-50'
+                              : 'bg-gradient-to-br from-yellow-50 to-orange-50'
                     "
                 >
+                    <!-- Already Collected Warning -->
+                    <div
+                        v-if="scanResult.already_collected"
+                        class="mb-4 sm:mb-6 text-center"
+                    >
+                        <XCircleIcon
+                            class="w-16 h-16 sm:w-24 sm:h-24 mx-auto mb-3 sm:mb-4 text-red-600"
+                        />
+                        <h2
+                            class="mb-2 text-2xl sm:text-3xl font-bold text-red-800"
+                        >
+                            ⚠ SUDAH DIGUNAKAN
+                        </h2>
+                        <p class="text-base sm:text-lg text-red-700">
+                            Barcode/Kode registrasi ini sudah pernah digunakan
+                        </p>
+                        <p
+                            v-if="scanResult.participant.racepack_collected_at"
+                            class="mt-2 text-sm text-red-600"
+                        >
+                            Waktu pengambilan:
+                            {{ scanResult.participant.racepack_collected_at }}
+                        </p>
+                    </div>
+
                     <!-- Success -->
                     <div
-                        v-if="scanResult.verified"
+                        v-else-if="scanResult.verified"
                         class="mb-4 sm:mb-6 text-center"
                     >
                         <CheckCircleIcon
@@ -554,6 +581,24 @@ onUnmounted(() => {
                                     {{
                                         scanResult.participant
                                             .payment_verified_at
+                                    }}
+                                </p>
+                            </div>
+                            <div
+                                v-if="
+                                    scanResult.participant.racepack_collected_at
+                                "
+                                class="sm:col-span-2"
+                            >
+                                <p class="text-xs sm:text-sm text-gray-600">
+                                    Tanggal Pengambilan Racepack
+                                </p>
+                                <p
+                                    class="text-sm sm:text-lg font-semibold text-green-600"
+                                >
+                                    {{
+                                        scanResult.participant
+                                            .racepack_collected_at
                                     }}
                                 </p>
                             </div>
